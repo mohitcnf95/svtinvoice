@@ -11,10 +11,17 @@
 
         .page {
             width: 210mm;
-            min-height: 297mm;
+            height: 297mm;
             background: white;
             margin: auto;
-            padding: 20px;
+            padding: 15mm;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        h2, h3 {
+            text-align: center;
+            margin: 5px;
         }
 
         table {
@@ -38,6 +45,12 @@
 
         .no-break {
             page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        input {
+            border: none;
+            border-bottom: 1px solid #ccc;
         }
 
         @media print {
@@ -51,19 +64,18 @@
 
 <div class="page">
 
-    <h2 style="text-align:center;">SIDDHI VINAYAK TRADERS</h2>
+    <h2>SIDDHI VINAYAK TRADERS</h2>
     <p style="text-align:center;">Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
-    <h3 style="text-align:center;">TAX INVOICE</h3>
+    <h3>TAX INVOICE</h3>
 
-    <p><strong>Invoice No:</strong> STV-INV-001</p>
-    <p><strong>Date:</strong> <input type="date" id="date"></p>
+    <p><strong>Invoice No:</strong> STV-INV-0005</p>
+    <p><strong>Date:</strong> <input type="date"></p>
 
     <p><strong>Place of Supply:</strong>
         <select id="pos" onchange="calc()">
             <option value="09">Uttar Pradesh (09)</option>
+            <option value="10">Bihar (10)</option>
             <option value="07">Delhi (07)</option>
-            <option value="06">Haryana (06)</option>
-            <option value="27">Maharashtra (27)</option>
         </select>
     </p>
 
@@ -102,23 +114,23 @@
         <h3>Grand Total: ₹ <span id="grandTotal">0</span></h3>
     </div>
 
-    <!-- FIXED SECTION -->
+    <!-- FINAL BLOCK -->
     <div class="no-break">
 
-        <p><strong>Total Amount (in words):</strong></p>
+        <p><strong>Amount in Words:</strong></p>
         <p id="amountWords"></p>
-
-        <p><strong>Bank Details:</strong><br>
-        UNION BANK OF INDIA<br>
-        A/C NO. :- 424301010040874<br>
-        IFSC CODE :- UBIN0542431
-        </p>
 
         <p><strong>Terms & Conditions:</strong><br>
         E.& O.E.<br>
         1. Goods once sold will not be taken back.<br>
         2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
         3. Subject to 'FIROZABAD' Jurisdiction only.
+        </p>
+
+        <p><strong>Bank Details:</strong><br>
+        UNION BANK OF INDIA<br>
+        A/C NO. :- 424301010040874<br>
+        IFSC CODE :- UBIN0542431
         </p>
 
         <br><br>
@@ -158,7 +170,6 @@ function calc() {
 
         let qty = row.cells[2].children[0].value || 0;
         let rate = row.cells[3].children[0].value || 0;
-        let gst = row.cells[4].children[0].value || 0;
 
         let total = qty * rate;
         row.cells[5].innerText = total;
@@ -169,7 +180,7 @@ function calc() {
     document.getElementById("subtotal").innerText = subtotal;
 
     let pos = document.getElementById("pos").value;
-    let sellerState = "09"; // Uttar Pradesh
+    let sellerState = "09";
 
     let cgst = 0, sgst = 0, igst = 0;
 
@@ -189,7 +200,7 @@ function calc() {
     document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
 
     document.getElementById("amountWords").innerText =
-        numberToWords(Math.round(grandTotal));
+        numberToWords(parseInt(grandTotal));
 }
 
 function numberToWords(num) {
@@ -198,7 +209,7 @@ function numberToWords(num) {
     
     const b = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
 
-    if (num === 0) return "Zero Only";
+    if (num === 0) return "Zero Rupees Only";
 
     function convert(n) {
         if (n < 20) return a[n];
@@ -209,7 +220,7 @@ function numberToWords(num) {
         return convert(Math.floor(n/10000000)) + " Crore " + convert(n%10000000);
     }
 
-    return convert(num).trim() + " Only";
+    return convert(num).replace(/\s+/g, ' ').trim() + " Rupees Only";
 }
 
 </script>

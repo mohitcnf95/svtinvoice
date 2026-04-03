@@ -4,7 +4,7 @@
     <title>Tax Invoice</title>
 
     <style>
-        body { font-family: Arial; background: #eee; margin: 0; }
+        body { font-family: Arial; background:#eee; margin:0; }
 
         .page {
             max-width: 900px;
@@ -13,33 +13,33 @@
             padding: 15px;
         }
 
-        h2, h3 { text-align: center; margin: 5px; }
+        h2,h3 { text-align:center; margin:5px; }
 
-        .table-container { overflow-x: auto; }
+        .table-container { overflow-x:auto; }
 
         table {
-            width: 100%;
-            min-width: 800px;
-            border-collapse: collapse;
-            margin-top: 10px;
+            width:100%;
+            min-width:900px;
+            border-collapse:collapse;
+            margin-top:10px;
         }
 
-        table, th, td { border: 1px solid black; }
+        table,th,td { border:1px solid black; }
 
-        th, td { padding: 6px; text-align: center; }
+        th,td { padding:6px; text-align:center; }
 
         .input {
-            width: 100%;
-            border: none;
-            text-align: center;
+            width:100%;
+            border:none;
+            text-align:center;
         }
 
-        .right { text-align: right; }
+        .right { text-align:right; }
 
         .flex {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
+            display:flex;
+            justify-content:space-between;
+            margin-top:40px;
         }
     </style>
 </head>
@@ -48,100 +48,98 @@
 
 <div class="page">
 
-    <h2>SIDDHI VINAYAK TRADERS</h2>
-    <p style="text-align:center;">Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
-    <h3>TAX INVOICE</h3>
+<h2>SIDDHI VINAYAK TRADERS</h2>
+<p style="text-align:center;">Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
+<h3>TAX INVOICE</h3>
 
-    <p><strong>Invoice No:</strong> STV-INV-001</p>
+<p><strong>Invoice No:</strong> STV-INV-0005</p>
 
-    <p><strong>Date:</strong> <input type="date"></p>
+<p><strong>Date:</strong> <input type="date"></p>
 
-    <p><strong>Place of Supply:</strong>
-        <select id="pos" onchange="calc()">
-            <option value="09">Uttar Pradesh (09)</option>
-            <option value="10">Bihar (10)</option>
-            <option value="07">Delhi (07)</option>
-        </select>
-    </p>
+<p><strong>Place of Supply:</strong>
+<select id="pos" onchange="calc()">
+<option value="09">Uttar Pradesh (09)</option>
+<option value="10">Bihar (10)</option>
+<option value="07">Delhi (07)</option>
+</select>
+</p>
 
-    <!-- 🔥 CLIENT DETAILS -->
-    <h4>Bill To</h4>
-    <input type="text" placeholder="Customer Name"><br><br>
-    <input type="text" placeholder="Customer Address"><br><br>
-    <input type="text" placeholder="GSTIN"><br><br>
+<!-- CLIENT -->
+<h4>Bill To</h4>
+<input type="text" placeholder="Customer Name"><br><br>
+<input type="text" placeholder="Customer Address"><br><br>
+<input type="text" placeholder="GSTIN"><br><br>
 
-    <!-- 🔥 TABLE -->
-    <div class="table-container">
-        <table id="items">
-            <thead>
-                <tr>
-                    <th>S.No</th>
-                    <th>Item</th>
-                    <th>CAS No.</th>
-                    <th>Pack Size</th>
-                    <th>Qty</th>
-                    <th>Rate</th>
-                    <th>GST%</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
+<!-- TABLE -->
+<div class="table-container">
+<table id="items">
+<thead>
+<tr>
+<th>S.No</th>
+<th>Item</th>
+<th>CAS No.</th>
+<th>Pack Size</th>
+<th>Qty</th>
+<th>Rate</th>
+<th>GST%</th>
+<th>Total</th>
+</tr>
+</thead>
 
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td><input class="input"></td>
-                    <td><input class="input"></td>
-                    <td><input class="input"></td>
-                    <td><input type="number" class="input" onchange="calc()"></td>
-                    <td><input type="number" class="input" onchange="calc()"></td>
-                    <td><input type="number" class="input" value="18" onchange="calc()"></td>
-                    <td class="total">0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+<tbody>
+<tr>
+<td>1</td>
+<td><input class="input"></td>
+<td><input class="input"></td>
+<td><input class="input"></td>
+<td><input type="number" class="input" onchange="calc()"></td>
+<td><input type="number" class="input" onchange="calc()"></td>
+<td><input type="number" class="input" value="18" onchange="calc()"></td>
+<td class="total">0</td>
+</tr>
+</tbody>
+</table>
+</div>
 
-    <button onclick="addRow()">+ Add Item</button>
+<button onclick="addRow()">+ Add Item</button>
 
-    <!-- TOTALS -->
-    <div class="right">
-        <p>Subtotal: ₹ <span id="subtotal">0</span></p>
-        <p>CGST: ₹ <span id="cgst">0</span></p>
-        <p>SGST: ₹ <span id="sgst">0</span></p>
-        <p>IGST: ₹ <span id="igst">0</span></p>
-        <h3>Grand Total: ₹ <span id="grandTotal">0</span></h3>
-    </div>
+<!-- TOTAL -->
+<div class="right">
+<p>Subtotal: ₹ <span id="subtotal">0</span></p>
+<p>CGST: ₹ <span id="cgst">0</span></p>
+<p>SGST: ₹ <span id="sgst">0</span></p>
+<p>IGST: ₹ <span id="igst">0</span></p>
+<h3>Grand Total: ₹ <span id="grandTotal">0</span></h3>
+</div>
 
-    <!-- 🔥 AMOUNT IN WORDS -->
-    <p><strong>Total Amount (in words):</strong></p>
-    <p id="amountWords"></p>
+<!-- WORDS -->
+<p><strong>Total Amount (in words):</strong></p>
+<p id="amountWords"></p>
 
-    <!-- 🔥 BANK -->
-    <p><strong>Bank Details:</strong><br>
-    UNION BANK OF INDIA<br>
-    A/C NO. :- 424301010040874<br>
-    IFSC CODE :- UBIN0542431
-    </p>
+<!-- BANK -->
+<p><strong>Bank Details:</strong><br>
+UNION BANK OF INDIA<br>
+A/C NO. :- 424301010040874<br>
+IFSC CODE :- UBIN0542431
+</p>
 
-    <!-- 🔥 TERMS -->
-    <p><strong>Terms & Conditions:</strong><br>
-    E.& O.E.<br>
-    1. Goods once sold will not be taken back.<br>
-    2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
-    3. Subject to 'FIROZABAD' Jurisdiction only.
-    </p>
+<!-- TERMS -->
+<p><strong>Terms & Conditions:</strong><br>
+E.& O.E.<br>
+1. Goods once sold will not be taken back.<br>
+2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
+3. Subject to 'FIROZABAD' Jurisdiction only.
+</p>
 
-    <!-- 🔥 SIGNATURES -->
-    <div class="flex">
-        <div>
-            Receiver's Signature
-        </div>
+<!-- SIGN -->
+<div class="flex">
+<div>Receiver's Signature</div>
 
-        <div style="text-align:right;">
-            For Siddhi Vinayak Traders<br><br><br>
-            Authorized Signatory
-        </div>
-    </div>
+<div style="text-align:right;">
+For Siddhi Vinayak Traders<br><br><br>
+Authorized Signatory
+</div>
+</div>
 
 </div>
 
@@ -154,14 +152,14 @@ function addRow() {
     let row = table.insertRow();
 
     row.innerHTML = `
-        <td>${rowCount}</td>
-        <td><input class="input"></td>
-        <td><input class="input"></td>
-        <td><input class="input"></td>
-        <td><input type="number" class="input" onchange="calc()"></td>
-        <td><input type="number" class="input" onchange="calc()"></td>
-        <td><input type="number" class="input" value="18" onchange="calc()"></td>
-        <td class="total">0</td>
+    <td>${rowCount}</td>
+    <td><input class="input"></td>
+    <td><input class="input"></td>
+    <td><input class="input"></td>
+    <td><input type="number" class="input" onchange="calc()"></td>
+    <td><input type="number" class="input" onchange="calc()"></td>
+    <td><input type="number" class="input" value="18" onchange="calc()"></td>
+    <td class="total">0</td>
     `;
 }
 
@@ -184,13 +182,13 @@ function calc() {
     let pos = document.getElementById("pos").value;
     let sellerState = "09";
 
-    let cgst = 0, sgst = 0, igst = 0;
+    let cgst=0, sgst=0, igst=0;
 
-    if (pos === sellerState) {
-        cgst = subtotal * 0.09;
-        sgst = subtotal * 0.09;
+    if(pos===sellerState){
+        cgst=subtotal*0.09;
+        sgst=subtotal*0.09;
     } else {
-        igst = subtotal * 0.18;
+        igst=subtotal*0.18;
     }
 
     document.getElementById("cgst").innerText = cgst.toFixed(2);
@@ -206,23 +204,23 @@ function calc() {
 }
 
 function numberToWords(num) {
-    const a = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten",
+    const a=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten",
     "Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
-    
-    const b = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
 
-    if (num === 0) return "Zero Rupees Only";
+    const b=["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
 
-    function convert(n) {
-        if (n < 20) return a[n];
-        if (n < 100) return b[Math.floor(n/10)] + " " + a[n%10];
-        if (n < 1000) return a[Math.floor(n/100)] + " Hundred " + convert(n%100);
-        if (n < 100000) return convert(Math.floor(n/1000)) + " Thousand " + convert(n%1000);
-        if (n < 10000000) return convert(Math.floor(n/100000)) + " Lakh " + convert(n%100000);
-        return convert(Math.floor(n/10000000)) + " Crore " + convert(n%10000000);
+    if(num===0) return "Zero Rupees Only";
+
+    function convert(n){
+        if(n<20) return a[n];
+        if(n<100) return b[Math.floor(n/10)]+" "+a[n%10];
+        if(n<1000) return a[Math.floor(n/100)]+" Hundred "+convert(n%100);
+        if(n<100000) return convert(Math.floor(n/1000))+" Thousand "+convert(n%1000);
+        if(n<10000000) return convert(Math.floor(n/100000))+" Lakh "+convert(n%100000);
+        return convert(Math.floor(n/10000000))+" Crore "+convert(n%10000000);
     }
 
-    return convert(num).replace(/\s+/g, ' ').trim() + " Rupees Only";
+    return convert(num).replace(/\s+/g,' ').trim()+" Rupees Only";
 }
 
 </script>

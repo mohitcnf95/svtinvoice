@@ -2,33 +2,53 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SVT Tax Invoice</title>
+<title>SVT Invoice</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body { font-family: Arial; background:#f5f5f5; }
-.container { max-width: 190mm; margin:auto; background:white; padding:20px; }
+
+.container {
+max-width: 1000px;
+margin:auto;
+background:white;
+padding:20px;
+}
+
 .header { text-align:center; }
-.logo { width:70px; }
 
 input, textarea, select {
-width:100%; border:none; font-size:12px;
+width:100%;
+border:none;
+font-size:12px;
 }
 
-table { width:100%; border-collapse:collapse; margin-top:10px; }
-th, td {
-border:1px solid black; padding:6px; font-size:12px; text-align:center;
+table {
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+table-layout:auto;
 }
+
+th, td {
+border:1px solid black;
+padding:6px;
+font-size:12px;
+text-align:center;
+word-wrap:break-word;
+}
+
 th { background:#f2f2f2; }
 
-.summary { text-align:right; }
-.footer {
-display:flex; justify-content:space-between; margin-top:40px;
-}
+.summary { text-align:right; margin-top:10px; }
 
-.hide { display:none; }
+.footer {
+display:flex;
+justify-content:space-between;
+margin-top:40px;
+}
 </style>
 </head>
 
@@ -38,12 +58,10 @@ display:flex; justify-content:space-between; margin-top:40px;
 
 <div class="header">
 <h2>SIDDHI VINAYAK TRADERS</h2>
-<p>Firozabad, UP</p>
-<p>GSTIN: 09BFZPK4340C2Z7</p>
+<p>Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
 <h3>TAX INVOICE</h3>
 </div>
 
-<div>
 Invoice No: <input id="invno"><br>
 Date: <input type="date" id="today"><br>
 
@@ -87,21 +105,25 @@ Place of Supply:
 <option value="37">Andhra Pradesh (37)</option>
 <option value="38">Ladakh (38)</option>
 </select>
-</div>
 
-<br>
+<br><br>
 
 <b>Bill To</b><br>
 <input id="clientName" placeholder="Client Name">
 <textarea id="clientAddress" placeholder="Address"></textarea>
 <input id="clientGST" placeholder="GSTIN">
 
-<br>
-
 <table>
 <thead>
 <tr>
-<th>Item</th><th>HSN</th><th>GST%</th><th>Qty</th><th>Rate</th><th>Total</th>
+<th>S.No</th>
+<th>Item</th>
+<th>CAS No</th>
+<th>Pack Size</th>
+<th>Qty</th>
+<th>Rate</th>
+<th>GST%</th>
+<th>Total</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -116,16 +138,23 @@ Place of Supply:
 <p id="sgstRow">SGST: ₹ <span id="sgst">0</span></p>
 <p id="igstRow">IGST: ₹ <span id="igst">0</span></p>
 
-<p>Round Off: 
-<select id="roundType" onchange="calc()">
-<option value="none">None</option>
-<option value="round">Round</option>
-</select>
-</p>
-
-<p>Round Off Value: ₹ <span id="roundVal">0</span></p>
-
 <h3>Grand Total: ₹ <span id="grand">0</span></h3>
+<p><b>Amount in Words:</b> <span id="words"></span></p>
+</div>
+
+<div>
+<b>Terms & Conditions:</b><br>
+E.& O.E.<br>
+1. Goods once sold will not be taken back.<br>
+2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
+3. Subject to 'FIROZABAD' Jurisdiction only.<br>
+
+<br>
+
+<b>Bank Details:</b><br>
+UNION BANK OF INDIA<br>
+A/C NO. :- 424301010040874<br>
+IFSC CODE :- UBIN0542431
 </div>
 
 <div class="footer">
@@ -147,13 +176,17 @@ invno.value = "SVT-INV-" + String(invCount).padStart(4,'0');
 addRow();
 
 function addRow(){
+let rowCount = tbody.rows.length + 1;
+
 let tr=document.createElement("tr");
 tr.innerHTML=`
+<td>${rowCount}</td>
 <td><input></td>
 <td><input></td>
+<td><input></td>
+<td><input type="number" oninput="calc()"></td>
+<td><input type="number" oninput="calc()"></td>
 <td><input value="18" oninput="calc()"></td>
-<td><input type="number" oninput="calc()"></td>
-<td><input type="number" oninput="calc()"></td>
 <td class="total">0</td>`;
 tbody.appendChild(tr);
 }
@@ -162,38 +195,25 @@ function calc(){
 let rows=document.querySelectorAll("#tbody tr");
 
 let sub=0,cgst=0,sgst=0,igst=0;
-let pos=posSelect();
+let pos=document.getElementById("pos").value;
 
 rows.forEach(r=>{
-let gst=r.cells[2].children[0].value||0;
-let qty=r.cells[3].children[0].value||0;
-let rate=r.cells[4].children[0].value||0;
+let qty=r.cells[4].children[0].value||0;
+let rate=r.cells[5].children[0].value||0;
+let gst=r.cells[6].children[0].value||0;
 
 let amt=qty*rate;
 let gstVal=amt*gst/100;
 
-r.cells[5].innerText=(amt+gstVal).toFixed(2);
-
+r.cells[7].innerText=(amt+gstVal).toFixed(2);
 sub+=amt;
 
-if(pos==="09"){
-cgst+=gstVal/2;
-sgst+=gstVal/2;
-}else{
-igst+=gstVal;
-}
+if(pos==="09"){ cgst+=gstVal/2; sgst+=gstVal/2; }
+else{ igst+=gstVal; }
 });
 
 let total=sub+cgst+sgst+igst;
 
-let roundVal=0;
-if(roundType.value==="round"){
-let r=Math.round(total);
-roundVal=r-total;
-total=r;
-}
-
-// show/hide
 if(pos==="09"){
 cgstRow.style.display="block";
 sgstRow.style.display="block";
@@ -204,38 +224,24 @@ sgstRow.style.display="none";
 igstRow.style.display="block";
 }
 
-sub=sub.toFixed(2);
-
-cgstEl(cgst);
-sgstEl(sgst);
-igstEl(igst);
-
-roundValEl(roundVal);
+sub.innerText=sub.toFixed(2);
+cgst.innerText=cgst.toFixed(2);
+sgst.innerText=sgst.toFixed(2);
+igst.innerText=igst.toFixed(2);
 grand.innerText=total.toFixed(2);
-subEl(sub);
+
+words.innerText = numberToWords(Math.round(total)) + " Rupees Only";
 }
 
-function posSelect(){
-return document.getElementById("pos").value;
+// SIMPLE WORD CONVERTER
+function numberToWords(num){
+return num.toLocaleString('en-IN');
 }
-
-function subEl(v){ sub.innerText=v; }
-function cgstEl(v){ cgst.innerText=v.toFixed(2); }
-function sgstEl(v){ sgst.innerText=v.toFixed(2); }
-function igstEl(v){ igst.innerText=v.toFixed(2); }
-function roundValEl(v){ roundVal.innerText=v.toFixed(2); }
 
 function preparePDF(){
-
-let client=clientName.value || "Client";
-let inv=invno.value;
-
-client=client.replace(/[^a-z0-9]/gi,'_');
-
-let filename=client+"_"+inv+".pdf";
-
+let client = clientName.value || "Client";
+let filename = client.replace(/[^a-z0-9]/gi,'_') + "_" + invno.value + ".pdf";
 html2pdf().from(invoice).save(filename);
-
 localStorage.setItem("invCount", parseInt(invCount)+1);
 }
 

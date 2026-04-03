@@ -11,12 +11,11 @@
 
         .page {
             width: 210mm;
-            height: 297mm;
+            min-height: 297mm;
             background: white;
             margin: auto;
             padding: 15mm;
             box-sizing: border-box;
-            overflow: hidden;
         }
 
         h2, h3 {
@@ -28,6 +27,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            table-layout: fixed;
         }
 
         table, th, td {
@@ -39,18 +39,26 @@
             text-align: center;
         }
 
+        .input {
+            width: 100%;
+            box-sizing: border-box;
+            border: none;
+            text-align: center;
+        }
+
         .right {
             text-align: right;
         }
 
         .no-break {
             page-break-inside: avoid;
-            break-inside: avoid;
         }
 
-        input {
-            border: none;
-            border-bottom: 1px solid #ccc;
+        @media screen and (max-width: 768px) {
+            .page {
+                width: 100%;
+                padding: 10px;
+            }
         }
 
         @media print {
@@ -68,7 +76,8 @@
     <p style="text-align:center;">Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
     <h3>TAX INVOICE</h3>
 
-    <p><strong>Invoice No:</strong> STV-INV-0005</p>
+    <p><strong>Invoice No:</strong> STV-INV-001</p>
+
     <p><strong>Date:</strong> <input type="date"></p>
 
     <p><strong>Place of Supply:</strong>
@@ -84,23 +93,27 @@
 
     <!-- TABLE -->
     <table id="items">
-        <tr>
-            <th>S.No</th>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Rate</th>
-            <th>GST%</th>
-            <th>Total</th>
-        </tr>
+        <thead>
+            <tr>
+                <th style="width:5%">S.No</th>
+                <th style="width:35%">Item</th>
+                <th style="width:10%">Qty</th>
+                <th style="width:15%">Rate</th>
+                <th style="width:10%">GST%</th>
+                <th style="width:15%">Total</th>
+            </tr>
+        </thead>
 
-        <tr>
-            <td>1</td>
-            <td><input type="text"></td>
-            <td><input type="number" onchange="calc()"></td>
-            <td><input type="number" onchange="calc()"></td>
-            <td><input type="number" value="18" onchange="calc()"></td>
-            <td class="total">0</td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><input type="text" class="input"></td>
+                <td><input type="number" class="input" onchange="calc()"></td>
+                <td><input type="number" class="input" onchange="calc()"></td>
+                <td><input type="number" class="input" value="18" onchange="calc()"></td>
+                <td class="total">0</td>
+            </tr>
+        </tbody>
     </table>
 
     <button onclick="addRow()">+ Add Item</button>
@@ -117,20 +130,20 @@
     <!-- FINAL BLOCK -->
     <div class="no-break">
 
-        <p><strong>Amount in Words:</strong></p>
+        <p><strong>Total Amount (in words):</strong></p>
         <p id="amountWords"></p>
+
+        <p><strong>Bank Details:</strong><br>
+        UNION BANK OF INDIA<br>
+        A/C NO. :- 424301010040874<br>
+        IFSC CODE :- UBIN0542431
+        </p>
 
         <p><strong>Terms & Conditions:</strong><br>
         E.& O.E.<br>
         1. Goods once sold will not be taken back.<br>
         2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
         3. Subject to 'FIROZABAD' Jurisdiction only.
-        </p>
-
-        <p><strong>Bank Details:</strong><br>
-        UNION BANK OF INDIA<br>
-        A/C NO. :- 424301010040874<br>
-        IFSC CODE :- UBIN0542431
         </p>
 
         <br><br>
@@ -147,27 +160,26 @@
 <script>
 
 function addRow() {
-    let table = document.getElementById("items");
-    let rowCount = table.rows.length;
+    let table = document.querySelector("#items tbody");
+    let rowCount = table.rows.length + 1;
 
     let row = table.insertRow();
+
     row.innerHTML = `
         <td>${rowCount}</td>
-        <td><input type="text"></td>
-        <td><input type="number" onchange="calc()"></td>
-        <td><input type="number" onchange="calc()"></td>
-        <td><input type="number" value="18" onchange="calc()"></td>
+        <td><input type="text" class="input"></td>
+        <td><input type="number" class="input" onchange="calc()"></td>
+        <td><input type="number" class="input" onchange="calc()"></td>
+        <td><input type="number" class="input" value="18" onchange="calc()"></td>
         <td class="total">0</td>
     `;
 }
 
 function calc() {
-    let rows = document.querySelectorAll("#items tr");
+    let rows = document.querySelectorAll("#items tbody tr");
     let subtotal = 0;
 
-    rows.forEach((row, index) => {
-        if (index === 0) return;
-
+    rows.forEach(row => {
         let qty = row.cells[2].children[0].value || 0;
         let rate = row.cells[3].children[0].value || 0;
 

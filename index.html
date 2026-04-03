@@ -4,11 +4,7 @@
     <title>Tax Invoice</title>
 
     <style>
-        body {
-            font-family: Arial;
-            background: #eee;
-            margin: 0;
-        }
+        body { font-family: Arial; background: #eee; margin: 0; }
 
         .page {
             max-width: 900px;
@@ -17,31 +13,20 @@
             padding: 15px;
         }
 
-        h2, h3 {
-            text-align: center;
-            margin: 5px;
-        }
+        h2, h3 { text-align: center; margin: 5px; }
 
-        /* 🔥 TABLE FIX */
-        .table-container {
-            overflow-x: auto;
-        }
+        .table-container { overflow-x: auto; }
 
         table {
             width: 100%;
-            min-width: 650px; /* prevents squeeze */
+            min-width: 800px;
             border-collapse: collapse;
             margin-top: 10px;
         }
 
-        table, th, td {
-            border: 1px solid black;
-        }
+        table, th, td { border: 1px solid black; }
 
-        th, td {
-            padding: 6px;
-            text-align: center;
-        }
+        th, td { padding: 6px; text-align: center; }
 
         .input {
             width: 100%;
@@ -49,16 +34,12 @@
             text-align: center;
         }
 
-        .right {
-            text-align: right;
-        }
+        .right { text-align: right; }
 
-        button {
-            margin-top: 5px;
-        }
-
-        @media print {
-            body { background: none; }
+        .flex {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
         }
     </style>
 </head>
@@ -71,7 +52,7 @@
     <p style="text-align:center;">Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
     <h3>TAX INVOICE</h3>
 
-    <p><strong>Invoice No:</strong> STV-INV-0005</p>
+    <p><strong>Invoice No:</strong> STV-INV-001</p>
 
     <p><strong>Date:</strong> <input type="date"></p>
 
@@ -83,16 +64,21 @@
         </select>
     </p>
 
+    <!-- 🔥 CLIENT DETAILS -->
     <h4>Bill To</h4>
     <input type="text" placeholder="Customer Name"><br><br>
+    <input type="text" placeholder="Customer Address"><br><br>
+    <input type="text" placeholder="GSTIN"><br><br>
 
-    <!-- 🔥 TABLE WRAPPER -->
+    <!-- 🔥 TABLE -->
     <div class="table-container">
         <table id="items">
             <thead>
                 <tr>
                     <th>S.No</th>
                     <th>Item</th>
+                    <th>CAS No.</th>
+                    <th>Pack Size</th>
                     <th>Qty</th>
                     <th>Rate</th>
                     <th>GST%</th>
@@ -103,7 +89,9 @@
             <tbody>
                 <tr>
                     <td>1</td>
-                    <td><input type="text" class="input"></td>
+                    <td><input class="input"></td>
+                    <td><input class="input"></td>
+                    <td><input class="input"></td>
                     <td><input type="number" class="input" onchange="calc()"></td>
                     <td><input type="number" class="input" onchange="calc()"></td>
                     <td><input type="number" class="input" value="18" onchange="calc()"></td>
@@ -124,10 +112,18 @@
         <h3>Grand Total: ₹ <span id="grandTotal">0</span></h3>
     </div>
 
-    <!-- FINAL -->
+    <!-- 🔥 AMOUNT IN WORDS -->
     <p><strong>Total Amount (in words):</strong></p>
     <p id="amountWords"></p>
 
+    <!-- 🔥 BANK -->
+    <p><strong>Bank Details:</strong><br>
+    UNION BANK OF INDIA<br>
+    A/C NO. :- 424301010040874<br>
+    IFSC CODE :- UBIN0542431
+    </p>
+
+    <!-- 🔥 TERMS -->
     <p><strong>Terms & Conditions:</strong><br>
     E.& O.E.<br>
     1. Goods once sold will not be taken back.<br>
@@ -135,18 +131,17 @@
     3. Subject to 'FIROZABAD' Jurisdiction only.
     </p>
 
-    <p><strong>Bank Details:</strong><br>
-    UNION BANK OF INDIA<br>
-    A/C NO. :- 424301010040874<br>
-    IFSC CODE :- UBIN0542431
-    </p>
+    <!-- 🔥 SIGNATURES -->
+    <div class="flex">
+        <div>
+            Receiver's Signature
+        </div>
 
-    <br><br>
-
-    <p class="right">
-    For Siddhi Vinayak Traders<br><br><br>
-    Authorized Signatory
-    </p>
+        <div style="text-align:right;">
+            For Siddhi Vinayak Traders<br><br><br>
+            Authorized Signatory
+        </div>
+    </div>
 
 </div>
 
@@ -160,7 +155,9 @@ function addRow() {
 
     row.innerHTML = `
         <td>${rowCount}</td>
-        <td><input type="text" class="input"></td>
+        <td><input class="input"></td>
+        <td><input class="input"></td>
+        <td><input class="input"></td>
         <td><input type="number" class="input" onchange="calc()"></td>
         <td><input type="number" class="input" onchange="calc()"></td>
         <td><input type="number" class="input" value="18" onchange="calc()"></td>
@@ -173,11 +170,11 @@ function calc() {
     let subtotal = 0;
 
     rows.forEach(row => {
-        let qty = row.cells[2].children[0].value || 0;
-        let rate = row.cells[3].children[0].value || 0;
+        let qty = row.cells[4].children[0].value || 0;
+        let rate = row.cells[5].children[0].value || 0;
 
         let total = qty * rate;
-        row.cells[5].innerText = total;
+        row.cells[7].innerText = total;
 
         subtotal += total;
     });

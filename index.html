@@ -7,15 +7,14 @@
         body {
             font-family: Arial;
             background: #eee;
+            margin: 0;
         }
 
         .page {
-            width: 210mm;
-            min-height: 297mm;
+            max-width: 900px;
             background: white;
             margin: auto;
-            padding: 15mm;
-            box-sizing: border-box;
+            padding: 15px;
         }
 
         h2, h3 {
@@ -23,11 +22,16 @@
             margin: 5px;
         }
 
+        /* 🔥 TABLE FIX */
+        .table-container {
+            overflow-x: auto;
+        }
+
         table {
             width: 100%;
+            min-width: 650px; /* prevents squeeze */
             border-collapse: collapse;
             margin-top: 10px;
-            table-layout: fixed;
         }
 
         table, th, td {
@@ -41,7 +45,6 @@
 
         .input {
             width: 100%;
-            box-sizing: border-box;
             border: none;
             text-align: center;
         }
@@ -50,20 +53,12 @@
             text-align: right;
         }
 
-        .no-break {
-            page-break-inside: avoid;
-        }
-
-        @media screen and (max-width: 768px) {
-            .page {
-                width: 100%;
-                padding: 10px;
-            }
+        button {
+            margin-top: 5px;
         }
 
         @media print {
             body { background: none; }
-            .page { margin: 0; }
         }
     </style>
 </head>
@@ -76,7 +71,7 @@
     <p style="text-align:center;">Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
     <h3>TAX INVOICE</h3>
 
-    <p><strong>Invoice No:</strong> STV-INV-001</p>
+    <p><strong>Invoice No:</strong> STV-INV-0005</p>
 
     <p><strong>Date:</strong> <input type="date"></p>
 
@@ -91,30 +86,32 @@
     <h4>Bill To</h4>
     <input type="text" placeholder="Customer Name"><br><br>
 
-    <!-- TABLE -->
-    <table id="items">
-        <thead>
-            <tr>
-                <th style="width:5%">S.No</th>
-                <th style="width:35%">Item</th>
-                <th style="width:10%">Qty</th>
-                <th style="width:15%">Rate</th>
-                <th style="width:10%">GST%</th>
-                <th style="width:15%">Total</th>
-            </tr>
-        </thead>
+    <!-- 🔥 TABLE WRAPPER -->
+    <div class="table-container">
+        <table id="items">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>GST%</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
 
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td><input type="text" class="input"></td>
-                <td><input type="number" class="input" onchange="calc()"></td>
-                <td><input type="number" class="input" onchange="calc()"></td>
-                <td><input type="number" class="input" value="18" onchange="calc()"></td>
-                <td class="total">0</td>
-            </tr>
-        </tbody>
-    </table>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td><input type="text" class="input"></td>
+                    <td><input type="number" class="input" onchange="calc()"></td>
+                    <td><input type="number" class="input" onchange="calc()"></td>
+                    <td><input type="number" class="input" value="18" onchange="calc()"></td>
+                    <td class="total">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <button onclick="addRow()">+ Add Item</button>
 
@@ -127,33 +124,29 @@
         <h3>Grand Total: ₹ <span id="grandTotal">0</span></h3>
     </div>
 
-    <!-- FINAL BLOCK -->
-    <div class="no-break">
+    <!-- FINAL -->
+    <p><strong>Total Amount (in words):</strong></p>
+    <p id="amountWords"></p>
 
-        <p><strong>Total Amount (in words):</strong></p>
-        <p id="amountWords"></p>
+    <p><strong>Terms & Conditions:</strong><br>
+    E.& O.E.<br>
+    1. Goods once sold will not be taken back.<br>
+    2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
+    3. Subject to 'FIROZABAD' Jurisdiction only.
+    </p>
 
-        <p><strong>Bank Details:</strong><br>
-        UNION BANK OF INDIA<br>
-        A/C NO. :- 424301010040874<br>
-        IFSC CODE :- UBIN0542431
-        </p>
+    <p><strong>Bank Details:</strong><br>
+    UNION BANK OF INDIA<br>
+    A/C NO. :- 424301010040874<br>
+    IFSC CODE :- UBIN0542431
+    </p>
 
-        <p><strong>Terms & Conditions:</strong><br>
-        E.& O.E.<br>
-        1. Goods once sold will not be taken back.<br>
-        2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
-        3. Subject to 'FIROZABAD' Jurisdiction only.
-        </p>
+    <br><br>
 
-        <br><br>
-
-        <p class="right">
-        For Siddhi Vinayak Traders<br><br><br>
-        Authorized Signatory
-        </p>
-
-    </div>
+    <p class="right">
+    For Siddhi Vinayak Traders<br><br><br>
+    Authorized Signatory
+    </p>
 
 </div>
 

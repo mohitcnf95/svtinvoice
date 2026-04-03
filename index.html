@@ -11,13 +11,15 @@
 body { font-family: Arial; background:#f5f5f5; }
 
 .container {
-max-width: 1000px;
+max-width: 210mm;
+min-height: 297mm;
 margin:auto;
 background:white;
-padding:20px;
+padding:15mm;
+box-sizing:border-box;
 }
 
-.header { text-align:center; }
+.header { text-align:center; margin-bottom:10px; }
 
 input, textarea, select {
 width:100%;
@@ -29,7 +31,7 @@ table {
 width:100%;
 border-collapse:collapse;
 margin-top:10px;
-table-layout:auto;
+table-layout:fixed;
 }
 
 th, td {
@@ -38,9 +40,20 @@ padding:6px;
 font-size:12px;
 text-align:center;
 word-wrap:break-word;
+white-space:normal;
 }
 
 th { background:#f2f2f2; }
+
+/* COLUMN WIDTHS */
+th:nth-child(1), td:nth-child(1){width:5%;}
+th:nth-child(2), td:nth-child(2){width:22%;}
+th:nth-child(3), td:nth-child(3){width:15%;}
+th:nth-child(4), td:nth-child(4){width:12%;}
+th:nth-child(5), td:nth-child(5){width:8%;}
+th:nth-child(6), td:nth-child(6){width:12%;}
+th:nth-child(7), td:nth-child(7){width:8%;}
+th:nth-child(8), td:nth-child(8){width:12%;}
 
 .summary { text-align:right; margin-top:10px; }
 
@@ -49,6 +62,9 @@ display:flex;
 justify-content:space-between;
 margin-top:40px;
 }
+
+.no-print { margin-top:10px; }
+.hide { display:none; }
 </style>
 </head>
 
@@ -129,7 +145,7 @@ Place of Supply:
 <tbody id="tbody"></tbody>
 </table>
 
-<button onclick="addRow()">+ Add Item</button>
+<button class="no-print" onclick="addRow()">+ Add Item</button>
 
 <div class="summary">
 <p>Subtotal: ₹ <span id="sub">0</span></p>
@@ -158,13 +174,13 @@ IFSC CODE :- UBIN0542431
 </div>
 
 <div class="footer">
-<div>Receiver Signature<br>___________</div>
+<div>Receiver Signature<br><br>____________________</div>
 <div>Authorised Signatory</div>
 </div>
 
 </div>
 
-<button onclick="preparePDF()">Download PDF</button>
+<button class="no-print" onclick="preparePDF()">Download PDF</button>
 
 <script>
 
@@ -194,7 +210,7 @@ tbody.appendChild(tr);
 function calc(){
 let rows=document.querySelectorAll("#tbody tr");
 
-let sub=0,cgst=0,sgst=0,igst=0;
+let subVal=0,cgstVal=0,sgstVal=0,igstVal=0;
 let pos=document.getElementById("pos").value;
 
 rows.forEach(r=>{
@@ -203,17 +219,18 @@ let rate=r.cells[5].children[0].value||0;
 let gst=r.cells[6].children[0].value||0;
 
 let amt=qty*rate;
-let gstVal=amt*gst/100;
+let gstAmt=amt*gst/100;
 
-r.cells[7].innerText=(amt+gstVal).toFixed(2);
-sub+=amt;
+r.cells[7].innerText=(amt+gstAmt).toFixed(2);
+subVal+=amt;
 
-if(pos==="09"){ cgst+=gstVal/2; sgst+=gstVal/2; }
-else{ igst+=gstVal; }
+if(pos==="09"){ cgstVal+=gstAmt/2; sgstVal+=gstAmt/2; }
+else{ igstVal+=gstAmt; }
 });
 
-let total=sub+cgst+sgst+igst;
+let total=subVal+cgstVal+sgstVal+igstVal;
 
+// show/hide GST
 if(pos==="09"){
 cgstRow.style.display="block";
 sgstRow.style.display="block";
@@ -224,24 +241,35 @@ sgstRow.style.display="none";
 igstRow.style.display="block";
 }
 
-sub.innerText=sub.toFixed(2);
-cgst.innerText=cgst.toFixed(2);
-sgst.innerText=sgst.toFixed(2);
-igst.innerText=igst.toFixed(2);
+sub.innerText=subVal.toFixed(2);
+cgst.innerText=cgstVal.toFixed(2);
+sgst.innerText=sgstVal.toFixed(2);
+igst.innerText=igstVal.toFixed(2);
 grand.innerText=total.toFixed(2);
 
 words.innerText = numberToWords(Math.round(total)) + " Rupees Only";
 }
 
-// SIMPLE WORD CONVERTER
+// SIMPLE WORD FORMAT (clean)
 function numberToWords(num){
 return num.toLocaleString('en-IN');
 }
 
+// PDF
 function preparePDF(){
+
 let client = clientName.value || "Client";
 let filename = client.replace(/[^a-z0-9]/gi,'_') + "_" + invno.value + ".pdf";
-html2pdf().from(invoice).save(filename);
+
+let opt = {
+margin:5,
+filename:filename,
+html2canvas:{scale:2},
+jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+};
+
+html2pdf().set(opt).from(invoice).save();
+
 localStorage.setItem("invCount", parseInt(invCount)+1);
 }
 

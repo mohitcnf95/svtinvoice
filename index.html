@@ -25,6 +25,7 @@ input, textarea, select {
 width:100%;
 border:none;
 font-size:12px;
+outline:none;
 }
 
 table {
@@ -45,17 +46,29 @@ white-space:normal;
 
 th { background:#f2f2f2; }
 
-/* column width */
-th:nth-child(1), td:nth-child(1){width:5%;}
-th:nth-child(2), td:nth-child(2){width:22%;}
-th:nth-child(3), td:nth-child(3){width:15%;}
-th:nth-child(4), td:nth-child(4){width:12%;}
-th:nth-child(5), td:nth-child(5){width:8%;}
-th:nth-child(6), td:nth-child(6){width:12%;}
-th:nth-child(7), td:nth-child(7){width:8%;}
-th:nth-child(8), td:nth-child(8){width:12%;}
+/* column widths */
+th:nth-child(1){width:5%;}
+th:nth-child(2){width:22%;}
+th:nth-child(3){width:15%;}
+th:nth-child(4){width:12%;}
+th:nth-child(5){width:8%;}
+th:nth-child(6){width:12%;}
+th:nth-child(7){width:8%;}
+th:nth-child(8){width:12%;}
 
-.summary { text-align:right; margin-top:10px; }
+.summary { margin-top:10px; }
+
+.summary p,
+.summary h3 {
+text-align:right;
+margin:4px 0;
+}
+
+#wordsLine {
+text-align:right;
+font-weight:bold;
+margin-top:5px;
+}
 
 .footer {
 display:flex;
@@ -87,7 +100,7 @@ cursor:pointer;
 <h3>TAX INVOICE</h3>
 </div>
 
-Invoice No: <input id="invno" type="text"><br>
+Invoice No: <input id="invno"><br>
 Date: <input type="date" id="today"><br>
 
 Place of Supply:
@@ -164,7 +177,7 @@ Place of Supply:
 <p id="igstRow">IGST: ₹ <span id="igst">0</span></p>
 
 <h3>Grand Total: ₹ <span id="grand">0</span></h3>
-<p><b>Amount in Words:</b> <span id="words"></span></p>
+<p id="wordsLine">Amount in Words: <span id="words"></span></p>
 </div>
 
 <div>
@@ -193,16 +206,21 @@ IFSC CODE :- UBIN0542431
 
 <script>
 
+// date
 document.getElementById("today").valueAsDate = new Date();
 
+// editable invoice no
+let invInput = document.getElementById("invno");
+if(invInput.value === ""){
 let invCount = localStorage.getItem("invCount") || 1;
-invno.value = "SVT-INV-" + String(invCount).padStart(4,'0');
+invInput.value = "SVT-INV-" + String(invCount).padStart(4,'0');
+}
 
 addRow();
 
 function addRow(){
-let rowCount = tbody.rows.length + 1;
 let tr=document.createElement("tr");
+let rowCount = tbody.rows.length + 1;
 
 tr.innerHTML=`
 <td>${rowCount}</td>
@@ -212,7 +230,7 @@ tr.innerHTML=`
 <td><input type="number" oninput="calc()"></td>
 <td><input type="number" oninput="calc()"></td>
 <td><input value="18" oninput="calc()"></td>
-<td class="total">0</td>`;
+<td>0</td>`;
 
 tbody.appendChild(tr);
 }
@@ -240,15 +258,10 @@ else{ igstVal+=gstAmt; }
 
 let total=subVal+cgstVal+sgstVal+igstVal;
 
-if(pos==="09"){
-cgstRow.style.display="block";
-sgstRow.style.display="block";
-igstRow.style.display="none";
-}else{
-cgstRow.style.display="none";
-sgstRow.style.display="none";
-igstRow.style.display="block";
-}
+// show/hide GST
+cgstRow.style.display = pos==="09" ? "block":"none";
+sgstRow.style.display = pos==="09" ? "block":"none";
+igstRow.style.display = pos==="09" ? "none":"block";
 
 sub.innerText=subVal.toFixed(2);
 cgst.innerText=cgstVal.toFixed(2);
@@ -262,18 +275,21 @@ words.innerText = total.toLocaleString('en-IN') + " Rupees Only";
 function preparePDF(){
 
 let client = clientName.value || "Client";
-let filename = client.replace(/[^a-z0-9]/gi,'_') + "_" + invno.value + ".pdf";
+let inv = invno.value;
+
+let filename = client.replace(/[^a-z0-9]/gi,'_') + "_" + inv + ".pdf";
 
 let opt = {
 margin:5,
 filename:filename,
 html2canvas:{scale:2},
-jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+jsPDF:{unit:'mm',format:'a4'}
 };
 
 html2pdf().set(opt).from(invoice).save();
 
-localStorage.setItem("invCount", parseInt(invCount)+1);
+let count = localStorage.getItem("invCount") || 1;
+localStorage.setItem("invCount", parseInt(count)+1);
 }
 
 </script>

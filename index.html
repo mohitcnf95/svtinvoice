@@ -8,40 +8,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body { font-family: Arial; background:#f5f5f5; }
-
-.container {
-max-width:210mm;
-min-height:297mm;
-margin:auto;
-background:white;
-padding:15mm;
-box-sizing:border-box;
+body {
+    font-family: Arial;
+    background:#f5f5f5;
+    margin:0;
+    padding:0;
 }
 
-.header { text-align:center; }
+.container {
+    max-width:210mm;
+    min-height:297mm;
+    margin:auto;
+    background:white;
+    padding:10mm 12mm;
+    box-sizing:border-box;
+}
+
+.header {
+    text-align:center;
+    margin-bottom:5px;
+}
+
+.header h2 { margin:0; }
+.header p { margin:2px 0; }
+.header h3 { margin:5px 0; }
 
 input, textarea, select {
-width:100%;
-border:none;
-font-size:12px;
-outline:none;
+    width:100%;
+    border:none;
+    font-size:12px;
+    outline:none;
 }
 
 table {
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-table-layout:fixed;
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    table-layout:fixed;
 }
 
 th, td {
-border:1px solid black;
-padding:6px;
-font-size:12px;
-text-align:center;
-word-wrap:break-word;
-white-space:normal;
+    border:1px solid black;
+    padding:6px;
+    font-size:12px;
+    text-align:center;
+    word-wrap:break-word;
 }
 
 th { background:#f2f2f2; }
@@ -60,32 +71,35 @@ th:nth-child(8){width:12%;}
 
 .summary p,
 .summary h3 {
-text-align:right;
-margin:4px 0;
+    text-align:right;
+    margin:3px 0;
 }
 
 #wordsLine {
-text-align:right;
-font-weight:bold;
-margin-top:5px;
+    text-align:right;
+    font-weight:bold;
 }
 
 .footer {
-display:flex;
-justify-content:space-between;
-margin-top:40px;
+    display:flex;
+    justify-content:space-between;
+    margin-top:25px;
+}
+
+/* prevent page break */
+#invoice, .summary, .footer {
+    page-break-inside: avoid;
 }
 
 #downloadBtn {
-margin-top:15px;
-padding:12px;
-background:black;
-color:white;
-border:none;
-width:100%;
-font-size:14px;
-border-radius:5px;
-cursor:pointer;
+    margin-top:10px;
+    padding:12px;
+    background:black;
+    color:white;
+    border:none;
+    width:100%;
+    font-size:14px;
+    border-radius:5px;
 }
 </style>
 </head>
@@ -115,33 +129,12 @@ Place of Supply:
 <option value="08">Rajasthan (08)</option>
 <option value="09" selected>Uttar Pradesh (09)</option>
 <option value="10">Bihar (10)</option>
-<option value="11">Sikkim (11)</option>
-<option value="12">Arunachal Pradesh (12)</option>
-<option value="13">Nagaland (13)</option>
-<option value="14">Manipur (14)</option>
-<option value="15">Mizoram (15)</option>
-<option value="16">Tripura (16)</option>
-<option value="17">Meghalaya (17)</option>
-<option value="18">Assam (18)</option>
 <option value="19">West Bengal (19)</option>
-<option value="20">Jharkhand (20)</option>
-<option value="21">Odisha (21)</option>
-<option value="22">Chhattisgarh (22)</option>
-<option value="23">Madhya Pradesh (23)</option>
 <option value="24">Gujarat (24)</option>
-<option value="26">Dadra & Nagar Haveli (26)</option>
 <option value="27">Maharashtra (27)</option>
-<option value="28">Andhra Pradesh (28)</option>
 <option value="29">Karnataka (29)</option>
-<option value="30">Goa (30)</option>
-<option value="31">Lakshadweep (31)</option>
-<option value="32">Kerala (32)</option>
 <option value="33">Tamil Nadu (33)</option>
-<option value="34">Puducherry (34)</option>
-<option value="35">Andaman & Nicobar (35)</option>
 <option value="36">Telangana (36)</option>
-<option value="37">Andhra Pradesh (37)</option>
-<option value="38">Ladakh (38)</option>
 </select>
 
 <br><br>
@@ -206,14 +199,13 @@ IFSC CODE :- UBIN0542431
 
 <script>
 
-// date
 document.getElementById("today").valueAsDate = new Date();
 
 // editable invoice no
-let invInput = document.getElementById("invno");
-if(invInput.value === ""){
-let invCount = localStorage.getItem("invCount") || 1;
-invInput.value = "SVT-INV-" + String(invCount).padStart(4,'0');
+let inv = document.getElementById("invno");
+if(inv.value === ""){
+    let count = localStorage.getItem("invCount") || 1;
+    inv.value = "SVT-INV-" + String(count).padStart(4,'0');
 }
 
 addRow();
@@ -258,7 +250,7 @@ else{ igstVal+=gstAmt; }
 
 let total=subVal+cgstVal+sgstVal+igstVal;
 
-// show/hide GST
+// GST display
 cgstRow.style.display = pos==="09" ? "block":"none";
 sgstRow.style.display = pos==="09" ? "block":"none";
 igstRow.style.display = pos==="09" ? "none":"block";
@@ -275,12 +267,10 @@ words.innerText = total.toLocaleString('en-IN') + " Rupees Only";
 function preparePDF(){
 
 let client = clientName.value || "Client";
-let inv = invno.value;
-
-let filename = client.replace(/[^a-z0-9]/gi,'_') + "_" + inv + ".pdf";
+let filename = client.replace(/[^a-z0-9]/gi,'_') + "_" + invno.value + ".pdf";
 
 let opt = {
-margin:5,
+margin:[3,5,5,5],
 filename:filename,
 html2canvas:{scale:2},
 jsPDF:{unit:'mm',format:'a4'}

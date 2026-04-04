@@ -21,8 +21,25 @@ body {
     box-sizing:border-box;
 }
 
-.header { text-align:center; }
-.header h2, .header p, .header h3 { margin:3px 0; }
+.header {
+    text-align:center;
+}
+
+/* 👇 MAKE TOGGLE CLEAR */
+.toggle-box {
+    margin:5px 0;
+}
+
+.toggle-box select {
+    width:auto;
+    padding:4px 8px;
+    border:1px solid #aaa;
+    font-size:12px;
+}
+
+.header h2, .header p, .header h3 {
+    margin:3px 0;
+}
 
 input, textarea, select {
     width:100%;
@@ -46,15 +63,6 @@ th, td {
 }
 
 th { background:#f2f2f2; }
-
-th:nth-child(1){width:5%;}
-th:nth-child(2){width:22%;}
-th:nth-child(3){width:15%;}
-th:nth-child(4){width:12%;}
-th:nth-child(5){width:8%;}
-th:nth-child(6){width:12%;}
-th:nth-child(7){width:8%;}
-th:nth-child(8){width:12%;}
 
 .summary {
     text-align:right;
@@ -80,7 +88,7 @@ th:nth-child(8){width:12%;}
     border:none;
 }
 
-/* SAMPLE MODE STYLING */
+/* SAMPLE */
 .sample-note {
     display:none;
     font-size:12px;
@@ -90,11 +98,11 @@ th:nth-child(8){width:12%;}
 .watermark {
     display:none;
     position:absolute;
-    top:40%;
+    top:45%;
     left:50%;
     transform:translate(-50%,-50%) rotate(-20deg);
     font-size:40px;
-    color:rgba(200,0,0,0.2);
+    color:rgba(200,0,0,0.15);
     font-weight:bold;
 }
 </style>
@@ -110,10 +118,14 @@ th:nth-child(8){width:12%;}
 <h2>SIDDHI VINAYAK TRADERS</h2>
 <p>Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
 
+<!-- ✅ TOGGLE NOW VISIBLE -->
+<div class="toggle-box">
+Document Type:
 <select id="docType" onchange="updateDocType()">
 <option value="invoice">Tax Invoice</option>
 <option value="sample">Free Sample</option>
 </select>
+</div>
 
 <h3 id="docTitle">TAX INVOICE</h3>
 </div>
@@ -166,7 +178,7 @@ Place of Supply:
 <b>Terms & Conditions:</b><br>
 E.& O.E.<br>
 1. Goods once sold will not be taken back.<br>
-2. Interest @ 18% p.a. will be charged if the payment is not made within the stipulated time.<br>
+2. Interest @ 18% p.a. will be charged if payment is delayed.<br>
 3. Subject to 'FIROZABAD' Jurisdiction only.<br>
 
 <br>
@@ -188,14 +200,12 @@ IFSC CODE :- UBIN0542431
 
 <script>
 
-// DATE
 today.valueAsDate = new Date();
 
-// INVOICE NUMBER
-let inv = document.getElementById("invno");
-if(inv.value===""){
+// invoice number
+if(invno.value===""){
 let c = localStorage.getItem("invCount")||1;
-inv.value="SVT-INV-"+String(c).padStart(4,'0');
+invno.value="SVT-INV-"+String(c).padStart(4,'0');
 }
 
 addRow();
@@ -218,12 +228,10 @@ tbody.appendChild(tr);
 }
 
 function calc(){
-
 let sub=0,cgst=0,sgst=0,igst=0;
-let pos=posSelect();
+let pos=pos.value;
 
 document.querySelectorAll("#tbody tr").forEach(r=>{
-
 let qty=r.cells[4].children[0].value||0;
 let rate=r.cells[5].children[0].value||0;
 let gst=r.cells[6].children[0].value||0;
@@ -234,50 +242,36 @@ let gstVal=amt*gst/100;
 r.cells[7].innerText=(amt+gstVal).toFixed(2);
 sub+=amt;
 
-if(pos==="09"){
-cgst+=gstVal/2;
-sgst+=gstVal/2;
-}else{
-igst+=gstVal;
-}
+if(pos==="09"){ cgst+=gstVal/2; sgst+=gstVal/2; }
+else{ igst+=gstVal; }
 });
 
 let total=sub+cgst+sgst+igst;
 
-// SAMPLE MODE → FORCE ZERO
-if(document.getElementById("docType").value==="sample"){
+// sample mode
+if(docType.value==="sample"){
 sub=0; cgst=0; sgst=0; igst=0; total=0;
-
 document.querySelectorAll("#tbody tr").forEach(r=>{
 r.cells[5].children[0].value=0;
 r.cells[7].innerText="0.00";
 });
 }
 
-// GST DISPLAY
 cgstRow.style.display = pos==="09" ? "block":"none";
 sgstRow.style.display = pos==="09" ? "block":"none";
 igstRow.style.display = pos==="09" ? "none":"block";
 
-subEl(sub);
-cgstEl(cgst);
-sgstEl(sgst);
-igstEl(igst);
+sub.innerText=sub.toFixed(2);
+cgst.innerText=cgst.toFixed(2);
+sgst.innerText=sgst.toFixed(2);
+igst.innerText=igst.toFixed(2);
 grand.innerText=total.toFixed(2);
 
 words.innerText = total.toLocaleString('en-IN')+" Rupees Only";
 }
 
-function posSelect(){ return document.getElementById("pos").value; }
-function subEl(v){ sub.innerText=v.toFixed(2); }
-function cgstEl(v){ cgst.innerText=v.toFixed(2); }
-function sgstEl(v){ sgst.innerText=v.toFixed(2); }
-function igstEl(v){ igst.innerText=v.toFixed(2); }
-
 function updateDocType(){
-let type=document.getElementById("docType").value;
-
-if(type==="sample"){
+if(docType.value==="sample"){
 docTitle.innerText="FREE SAMPLE / PROFORMA INVOICE";
 sampleNote.style.display="block";
 watermark.style.display="block";
@@ -286,13 +280,11 @@ docTitle.innerText="TAX INVOICE";
 sampleNote.style.display="none";
 watermark.style.display="none";
 }
-
 calc();
 }
 
 function preparePDF(){
-let client = clientName.value || "Client";
-let filename = client.replace(/[^a-z0-9]/gi,'_') + "_" + invno.value + ".pdf";
+let filename = (clientName.value||"Client") + "_" + invno.value + ".pdf";
 
 html2pdf().set({
 margin:[8,8,8,8],

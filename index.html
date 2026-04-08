@@ -40,8 +40,6 @@ table {
 width:100%;
 border-collapse:collapse;
 margin-top:8px;
-
-/* ✅ FIXED */
 table-layout:auto;
 }
 
@@ -53,7 +51,7 @@ text-align:center;
 vertical-align:top;
 }
 
-/* ✅ ITEM COLUMN WRAP */
+/* ITEM WRAP */
 td:nth-child(2), th:nth-child(2) {
 white-space: normal;
 word-break: break-word;
@@ -251,8 +249,10 @@ IFSC CODE :- UBIN0542431
 
 <script>
 
+// DATE
 today.valueAsDate = new Date();
 
+// INVOICE NUMBER
 if(invno.value===""){
 let c = localStorage.getItem("invCount")||1;
 invno.value="SVT-INV-"+String(c).padStart(4,'0');
@@ -260,6 +260,7 @@ invno.value="SVT-INV-"+String(c).padStart(4,'0');
 
 addRow();
 
+// ADD ROW
 function addRow(){
 let tr=document.createElement("tr");
 let n=tbody.rows.length+1;
@@ -277,12 +278,49 @@ tr.innerHTML=`
 tbody.appendChild(tr);
 }
 
-/* AUTO HEIGHT */
+// AUTO HEIGHT
 function autoGrow(el){
 el.style.height="auto";
 el.style.height=el.scrollHeight+"px";
 }
 
+// NUMBER TO WORDS (INDIAN)
+function numberToWords(num){
+
+const a = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten",
+"Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
+
+const b = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+
+function inWords(n){
+if(n<20) return a[n];
+if(n<100) return b[Math.floor(n/10)] + " " + a[n%10];
+if(n<1000) return a[Math.floor(n/100)] + " Hundred " + inWords(n%100);
+return "";
+}
+
+let result = "";
+
+let crore = Math.floor(num/10000000);
+num %= 10000000;
+
+let lakh = Math.floor(num/100000);
+num %= 100000;
+
+let thousand = Math.floor(num/1000);
+num %= 1000;
+
+let hundred = num;
+
+if(crore) result += inWords(crore) + " Crore ";
+if(lakh) result += inWords(lakh) + " Lakh ";
+if(thousand) result += inWords(thousand) + " Thousand ";
+if(hundred) result += inWords(hundred);
+
+return result.trim();
+}
+
+// CALCULATION
 function calc(){
 let sub=0,cgst=0,sgst=0,igst=0;
 let pos=document.getElementById("pos").value;
@@ -318,9 +356,11 @@ sgst.innerText=sgst.toFixed(2);
 igst.innerText=igst.toFixed(2);
 grand.innerText=total.toFixed(2);
 
-words.innerText = total.toLocaleString('en-IN')+" Rupees Only";
+/* ✅ FINAL WORDS */
+words.innerText = numberToWords(Math.round(total)) + " Rupees Only";
 }
 
+// DOC TYPE
 function updateDocType(){
 if(docType.value==="sample"){
 docTitle.innerText="FREE SAMPLE / PROFORMA INVOICE";
@@ -334,6 +374,7 @@ watermark.style.display="none";
 calc();
 }
 
+// PDF
 function preparePDF(){
 let filename = (clientName.value||"Client") + "_" + invno.value + ".pdf";
 

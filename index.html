@@ -18,7 +18,7 @@ box-sizing:border-box;
 }
 
 .header { text-align:center; }
-.logo { width:60px; }
+.logo { width:70px; }
 
 .row { display:flex; gap:10px; }
 .col { flex:1; }
@@ -47,25 +47,22 @@ font-size:12px;
 text-align:center;
 }
 
-.summary {
-text-align:right;
-margin-top:10px;
-}
+.summary { text-align:right; margin-top:10px; }
 
 .footer-box {
 display:flex;
-margin-top:10px;
 border:1px solid black;
+margin-top:10px;
 }
 
-.footer-left {
+.footer-left, .footer-right {
 flex:1;
 padding:8px;
-border-right:1px solid black;
 font-size:10px;
+border-right:1px solid black;
 }
 
-.footer-left:last-child { border-right:none; }
+.footer-right { border-right:none; }
 
 .sign {
 display:flex;
@@ -106,14 +103,20 @@ Date:
 
 <div class="col">
 Mode of Supply:
-<input placeholder="Road / Courier"><br>
+<input placeholder="Road / Courier">
+</div>
+</div>
 
+<div class="row">
+<div class="col">
 Place of Supply:
-<input id="place" placeholder="Enter Place of Supply"><br>
+<input id="place" placeholder="Enter Place">
+</div>
 
-State (for GST):
+<div class="col">
+State (GST):
 <select id="state" onchange="calc()">
-<option value="">-- Select State --</option>
+<option value="">-- Select --</option>
 <option value="09">Uttar Pradesh (09)</option>
 <option value="07">Delhi (07)</option>
 <option value="06">Haryana (06)</option>
@@ -129,12 +132,12 @@ State (for GST):
 
 <div class="row" style="margin-top:10px;">
 <div class="col">
-<b>Billed To:</b><br>
+<b>Billed To:</b>
 <textarea></textarea>
 </div>
 
 <div class="col">
-<b>Shipped To:</b><br>
+<b>Shipped To:</b>
 <textarea></textarea>
 </div>
 </div>
@@ -167,26 +170,35 @@ E-Way Bill No:
 </div>
 
 <div class="footer-box">
+
 <div class="footer-left">
 <b>Bank Details:</b><br>
 UNION BANK OF INDIA<br>
 A/C NO.: 424301010040874<br>
-IFSC: UBIN0542431
+IFSC CODE: UBIN0542431
 </div>
 
-<div class="footer-left">
+<div class="footer-right">
 <b>Terms & Conditions:</b><br>
 E.& O.E.<br>
 1. Goods once sold will not be taken back.<br>
-2. Interest @ 18% p.a. if delayed.<br>
+2. Interest @ 18% p.a. will be charged if payment is delayed.<br>
 3. Above mentioned item/items are for R&D/Laboratory use ONLY.<br>
 4. Subject to 'FIROZABAD' Jurisdiction only.
 </div>
+
 </div>
 
 <div class="sign">
-<div>Receiver's Signature<br>__________</div>
-<div>For Siddhi Vinayak Traders<br><br>Authorised Signatory</div>
+<div>
+Receiver's Signature<br>
+__________
+</div>
+
+<div>
+For Siddhi Vinayak Traders<br><br>
+Authorised Signatory
+</div>
 </div>
 
 </div>
@@ -229,34 +241,27 @@ let gst=r.cells[6].children[0].value||0;
 let amt=qty*rate;
 let gstVal=amt*gst/100;
 
-// correct row total
 let rowTotal=amt+gstVal;
 r.cells[7].innerText=rowTotal.toFixed(2);
 
 sub+=amt;
 
-// GST logic
-if(state===""){
-}
-else if(state==="09"){
+if(state==="09"){
 cgst+=gstVal/2;
 sgst+=gstVal/2;
-}
-else{
+}else if(state!==""){
 igst+=gstVal;
 }
 
 });
 
-// total before round
 let total=sub+cgst+sgst+igst;
 
-// round
+// round off
 let rounded=Math.round(total);
 let roundVal=rounded-total;
 
-document.getElementById("roundOff").innerText=
-(roundVal>=0?"+":"")+roundVal.toFixed(2);
+roundOff.innerText=(roundVal>=0?"+":"")+roundVal.toFixed(2);
 
 // final total
 let finalTotal=rounded;
@@ -266,7 +271,7 @@ cgstRow.style.display = state==="09" ? "block":"none";
 sgstRow.style.display = state==="09" ? "block":"none";
 igstRow.style.display = (state && state!=="09") ? "block":"none";
 
-// update UI
+// update
 sub.innerText=sub.toFixed(2);
 cgst.innerText=cgst.toFixed(2);
 sgst.innerText=sgst.toFixed(2);
@@ -285,7 +290,8 @@ ewayBox.style.display="none";
 }
 
 function preparePDF(){
-html2pdf().from(invoice).save("Invoice.pdf");
+let name=(invno.value||"Invoice")+".pdf";
+html2pdf().from(invoice).save(name);
 }
 
 </script>

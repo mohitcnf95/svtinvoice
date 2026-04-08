@@ -14,7 +14,6 @@ max-width:210mm;
 margin:auto;
 background:white;
 padding:8mm;
-box-sizing:border-box;
 }
 
 .header { text-align:center; }
@@ -29,10 +28,7 @@ border:none;
 font-size:12px;
 }
 
-textarea {
-white-space:pre-wrap;
-word-break:break-word;
-}
+textarea { white-space:pre-wrap; }
 
 table {
 width:100%;
@@ -89,7 +85,7 @@ border:none;
 <img src="logo.png" class="logo"><br>
 <h2>SIDDHI VINAYAK TRADERS</h2>
 <p>12/306, Arya Nagar, Firozabad - 283203</p>
-<p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722 | svtjp11@gmail.com</p>
+<p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722</p>
 <h3>TAX INVOICE</h3>
 </div>
 
@@ -110,7 +106,7 @@ Mode of Supply:
 <div class="row">
 <div class="col">
 Place of Supply:
-<input placeholder="Enter Place">
+<input>
 </div>
 
 <div class="col">
@@ -169,8 +165,8 @@ IFSC: UBIN0542431
 E.& O.E.<br>
 1. Goods once sold will not be taken back.<br>
 2. Interest @ 18% p.a. if delayed.<br>
-3. Above mentioned item/items are for R&D/Laboratory use ONLY.<br>
-4. Subject to 'FIROZABAD' Jurisdiction only.
+3. Above mentioned item/items are for R&D use ONLY.<br>
+4. Subject to Firozabad jurisdiction.
 </div>
 </div>
 
@@ -219,38 +215,36 @@ let gst=parseFloat(r.cells[6].children[0].value)||0;
 let amt=qty*rate;
 let gstVal=amt*gst/100;
 
-let rowTotal=amt+gstVal;
-r.cells[7].innerText=rowTotal.toFixed(2);
+subtotal += amt;
 
-subtotal+=amt;
-
+// GST ALWAYS CALCULATED
 if(state==="09"){
-cgst+=gstVal/2;
-sgst+=gstVal/2;
-}else if(state!==""){
-igst+=gstVal;
+cgst += gstVal/2;
+sgst += gstVal/2;
 }
+else if(state!==""){
+igst += gstVal;
+}
+
+// row total (always correct)
+r.cells[7].innerText=(amt+gstVal).toFixed(2);
 
 });
 
-let total=subtotal+cgst+sgst+igst;
+let total = subtotal + cgst + sgst + igst;
 
 // ROUND
-let rounded=Math.round(total);
-let roundVal=rounded-total;
+let rounded = Math.round(total);
+let roundVal = rounded - total;
 
-document.getElementById("roundOff").innerText=
-(roundVal>=0?"+":"")+roundVal.toFixed(2);
-
-// FINAL TOTAL
-let finalTotal=rounded;
+roundOff.innerText = (roundVal>=0?"+":"")+roundVal.toFixed(2);
 
 // DISPLAY
-document.getElementById("sub").innerText=subtotal.toFixed(2);
-document.getElementById("cgst").innerText=cgst.toFixed(2);
-document.getElementById("sgst").innerText=sgst.toFixed(2);
-document.getElementById("igst").innerText=igst.toFixed(2);
-document.getElementById("grand").innerText=finalTotal.toFixed(2);
+sub.innerText = subtotal.toFixed(2);
+cgst.innerText = cgst.toFixed(2);
+sgst.innerText = sgst.toFixed(2);
+igst.innerText = igst.toFixed(2);
+grand.innerText = rounded.toFixed(2);
 
 // GST visibility
 cgstRow.style.display = state==="09" ? "block":"none";
@@ -258,11 +252,10 @@ sgstRow.style.display = state==="09" ? "block":"none";
 igstRow.style.display = (state && state!=="09") ? "block":"none";
 
 // WORDS
-document.getElementById("words").innerText =
-finalTotal.toLocaleString('en-IN') + " Rupees Only";
+words.innerText = rounded.toLocaleString('en-IN') + " Rupees Only";
 
 // EWAY
-ewayBox.style.display = finalTotal>50000 ? "block":"none";
+ewayBox.style.display = rounded>50000 ? "block":"none";
 
 }
 

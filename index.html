@@ -290,13 +290,14 @@ tbody.appendChild(tr);
 }
 
 function calc(){
+
 let subtotal=0,cgstVal=0,sgstVal=0,igstVal=0;
-let pos=pos.value;
+let posVal=document.getElementById("pos").value;
 
 document.querySelectorAll("#tbody tr").forEach(r=>{
-let qty=r.cells[4].children[0].value||0;
-let rate=r.cells[5].children[0].value||0;
-let gst=r.cells[6].children[0].value||0;
+let qty=parseFloat(r.cells[4].children[0].value)||0;
+let rate=parseFloat(r.cells[5].children[0].value)||0;
+let gst=parseFloat(r.cells[6].children[0].value)||0;
 
 let amt=qty*rate;
 let gstAmt=amt*gst/100;
@@ -304,12 +305,16 @@ let gstAmt=amt*gst/100;
 r.cells[7].innerText=(amt+gstAmt).toFixed(2);
 subtotal+=amt;
 
-if(pos==="09"){cgstVal+=gstAmt/2;sgstVal+=gstAmt/2;}
-else if(pos){igstVal+=gstAmt;}
+if(posVal==="09"){
+cgstVal+=gstAmt/2;
+sgstVal+=gstAmt/2;
+}else if(posVal!==""){
+igstVal+=gstAmt;
+}
 });
 
 let total=subtotal+cgstVal+sgstVal+igstVal;
-let round=Math.round(total);
+let round=Math.round(total||0);
 let diff=round-total;
 
 sub.innerText=subtotal.toFixed(2);
@@ -321,9 +326,9 @@ grand.innerText=round.toFixed(2);
 
 words.innerText=round.toLocaleString('en-IN')+" Rupees Only";
 
-cgstRow.style.display=pos==="09"?"block":"none";
-sgstRow.style.display=pos==="09"?"block":"none";
-igstRow.style.display=pos==="09"?"none":"block";
+cgstRow.style.display=posVal==="09"?"block":"none";
+sgstRow.style.display=posVal==="09"?"block":"none";
+igstRow.style.display=posVal==="09"?"none":"block";
 }
 
 function preparePDF() {

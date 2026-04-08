@@ -15,13 +15,13 @@ margin:auto;
 background:white;
 padding:8mm;
 box-sizing:border-box;
-position:relative;
 }
 
 .header { text-align:center; }
-.header h2, .header p, .header h3 { margin:3px 0; }
+.logo { width:60px; }
 
-.toggle-box { margin:5px 0; }
+.row { display:flex; gap:10px; }
+.col { flex:1; }
 
 input, textarea, select {
 width:100%;
@@ -29,18 +29,15 @@ border:none;
 font-size:12px;
 }
 
-/* ADDRESS WRAP */
-#clientAddress {
-white-space: pre-wrap;
-word-break: break-word;
+textarea {
+white-space:pre-wrap;
+word-break:break-word;
 }
 
-/* TABLE */
 table {
 width:100%;
 border-collapse:collapse;
 margin-top:8px;
-table-layout:auto;
 }
 
 th, td {
@@ -48,49 +45,32 @@ border:1px solid black;
 padding:5px;
 font-size:12px;
 text-align:center;
-vertical-align:top;
 }
-
-/* ITEM WRAP */
-td:nth-child(2), th:nth-child(2) {
-white-space: normal;
-word-break: break-word;
-}
-
-/* INPUT FIX */
-td input, td textarea {
-width:100%;
-border:none;
-font-size:12px;
-white-space: normal;
-word-break: break-word;
-resize:none;
-overflow:hidden;
-}
-
-/* COLUMN WIDTH */
-th:nth-child(1){width:5%;}
-th:nth-child(2){width:30%;}
-th:nth-child(3){width:13%;}
-th:nth-child(4){width:12%;}
-th:nth-child(5){width:7%;}
-th:nth-child(6){width:10%;}
-th:nth-child(7){width:7%;}
-th:nth-child(8){width:16%;}
 
 .summary {
 text-align:right;
-margin-top:8px;
+margin-top:10px;
 }
 
-.summary p, .summary h3 {
-margin:2px 0;
+.footer-box {
+display:flex;
+margin-top:10px;
+border:1px solid black;
 }
 
-.footer {
+.footer-left {
+flex:1;
+padding:8px;
+border-right:1px solid black;
+font-size:10px;
+}
+
+.footer-left:last-child { border-right:none; }
+
+.sign {
 display:flex;
 justify-content:space-between;
-margin-top:15px;
+margin-top:20px;
 }
 
 #downloadBtn {
@@ -101,26 +81,6 @@ background:black;
 color:white;
 border:none;
 }
-
-/* SAMPLE */
-.sample-note {
-display:none;
-font-size:12px;
-margin:10px 0;
-font-weight:bold;
-}
-
-.watermark {
-display:none;
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%) rotate(-20deg);
-font-size:50px;
-color:rgba(200,0,0,0.12);
-font-weight:bold;
-pointer-events:none;
-}
 </style>
 </head>
 
@@ -128,85 +88,67 @@ pointer-events:none;
 
 <div id="invoice" class="container">
 
-<div class="watermark" id="watermark">FREE SAMPLE</div>
-
 <div class="header">
+<img src="logo.png" class="logo"><br>
 <h2>SIDDHI VINAYAK TRADERS</h2>
-<p>Firozabad, UP | GSTIN: 09BFZPK4340C2Z7</p>
-
-<div class="toggle-box">
-Document Type:
-<select id="docType" onchange="updateDocType()">
-<option value="invoice">Tax Invoice</option>
-<option value="sample">Free Sample</option>
-</select>
+<p>12/306, Arya Nagar, Firozabad - 283203</p>
+<p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722 | svtjp11@gmail.com</p>
+<h3>TAX INVOICE</h3>
 </div>
 
-<h3 id="docTitle">TAX INVOICE</h3>
+<div class="row">
+<div class="col">
+Invoice No:
+<input id="invno" value="SVT/26-27/0001"><br>
+Date:
+<input type="date" id="today">
 </div>
 
-<div id="sampleNote" class="sample-note">
-Material supplied free of cost for testing / R&D purpose only. No commercial value.
-</div>
-
-Invoice No: <input id="invno"><br>
-Date: <input type="date" id="today"><br>
+<div class="col">
+Mode of Supply:
+<input placeholder="Road / Courier"><br>
 
 Place of Supply:
-<select id="pos" onchange="calc()">
-<option value="01">Jammu & Kashmir (01)</option>
-<option value="02">Himachal Pradesh (02)</option>
-<option value="03">Punjab (03)</option>
-<option value="04">Chandigarh (04)</option>
-<option value="05">Uttarakhand (05)</option>
-<option value="06">Haryana (06)</option>
+<input id="place" placeholder="Enter Place of Supply"><br>
+
+State (for GST):
+<select id="state" onchange="calc()">
+<option value="">-- Select State --</option>
+<option value="09">Uttar Pradesh (09)</option>
 <option value="07">Delhi (07)</option>
-<option value="08">Rajasthan (08)</option>
-<option value="09" selected>Uttar Pradesh (09)</option>
-<option value="10">Bihar (10)</option>
-<option value="11">Sikkim (11)</option>
-<option value="12">Arunachal Pradesh (12)</option>
-<option value="13">Nagaland (13)</option>
-<option value="14">Manipur (14)</option>
-<option value="15">Mizoram (15)</option>
-<option value="16">Tripura (16)</option>
-<option value="17">Meghalaya (17)</option>
-<option value="18">Assam (18)</option>
-<option value="19">West Bengal (19)</option>
-<option value="20">Jharkhand (20)</option>
-<option value="21">Odisha (21)</option>
-<option value="22">Chhattisgarh (22)</option>
-<option value="23">Madhya Pradesh (23)</option>
-<option value="24">Gujarat (24)</option>
-<option value="26">Dadra & Nagar Haveli (26)</option>
+<option value="06">Haryana (06)</option>
 <option value="27">Maharashtra (27)</option>
-<option value="28">Andhra Pradesh (28)</option>
+<option value="24">Gujarat (24)</option>
 <option value="29">Karnataka (29)</option>
-<option value="30">Goa (30)</option>
-<option value="31">Lakshadweep (31)</option>
-<option value="32">Kerala (32)</option>
 <option value="33">Tamil Nadu (33)</option>
-<option value="34">Puducherry (34)</option>
-<option value="35">Andaman & Nicobar (35)</option>
+<option value="19">West Bengal (19)</option>
 <option value="36">Telangana (36)</option>
-<option value="37">Andhra Pradesh (New) (37)</option>
-<option value="38">Ladakh (38)</option>
 </select>
+</div>
+</div>
 
-<br>
+<div class="row" style="margin-top:10px;">
+<div class="col">
+<b>Billed To:</b><br>
+<textarea></textarea>
+</div>
 
-<b>Bill To</b><br>
-<input id="clientName" placeholder="Client Name">
-<textarea id="clientAddress" placeholder="Address"></textarea>
-<input id="clientGST" placeholder="GSTIN">
+<div class="col">
+<b>Shipped To:</b><br>
+<textarea></textarea>
+</div>
+</div>
+
+<div id="ewayBox" style="display:none;">
+E-Way Bill No:
+<input>
+</div>
 
 <table>
-<thead>
 <tr>
-<th>S.No</th><th>Item</th><th>CAS No</th><th>Pack Size</th>
+<th>S.No</th><th>Item</th><th>CAS</th><th>Pack</th>
 <th>Qty</th><th>Rate</th><th>GST%</th><th>Total</th>
 </tr>
-</thead>
 <tbody id="tbody"></tbody>
 </table>
 
@@ -218,29 +160,33 @@ Place of Supply:
 <p id="sgstRow">SGST: ₹ <span id="sgst">0</span></p>
 <p id="igstRow">IGST: ₹ <span id="igst">0</span></p>
 
+<p>Round Off: ₹ <span id="roundOff">0</span></p>
+
 <h3>Grand Total: ₹ <span id="grand">0</span></h3>
 <p><b>Amount in Words:</b> <span id="words"></span></p>
 </div>
 
-<div>
+<div class="footer-box">
+<div class="footer-left">
+<b>Bank Details:</b><br>
+UNION BANK OF INDIA<br>
+A/C NO.: 424301010040874<br>
+IFSC: UBIN0542431
+</div>
+
+<div class="footer-left">
 <b>Terms & Conditions:</b><br>
 E.& O.E.<br>
 1. Goods once sold will not be taken back.<br>
-2. Interest @ 18% p.a. will be charged if payment is delayed.<br>
-3. The mentioned item/items in the quotation are for R&D purpose only.<br>
-4. Subject to 'FIROZABAD' Jurisdiction only.<br>
-
-<br>
-
-<b>Bank Details:</b><br>
-UNION BANK OF INDIA<br>
-A/C NO. :- 424301010040874<br>
-IFSC CODE :- UBIN0542431
+2. Interest @ 18% p.a. if delayed.<br>
+3. Above mentioned item/items are for R&D/Laboratory use ONLY.<br>
+4. Subject to 'FIROZABAD' Jurisdiction only.
+</div>
 </div>
 
-<div class="footer">
-<div>Receiver Signature<br>__________</div>
-<div>Authorised Signatory</div>
+<div class="sign">
+<div>Receiver's Signature<br>__________</div>
+<div>For Siddhi Vinayak Traders<br><br>Authorised Signatory</div>
 </div>
 
 </div>
@@ -249,25 +195,16 @@ IFSC CODE :- UBIN0542431
 
 <script>
 
-// DATE
-today.valueAsDate = new Date();
-
-// INVOICE NUMBER
-if(invno.value===""){
-let c = localStorage.getItem("invCount")||1;
-invno.value="SVT-INV-"+String(c).padStart(4,'0');
-}
-
+today.valueAsDate=new Date();
 addRow();
 
-// ADD ROW
 function addRow(){
 let tr=document.createElement("tr");
 let n=tbody.rows.length+1;
 
 tr.innerHTML=`
 <td>${n}</td>
-<td><textarea rows="1" oninput="autoGrow(this)"></textarea></td>
+<td><textarea></textarea></td>
 <td><input></td>
 <td><input></td>
 <td><input type="number" oninput="calc()"></td>
@@ -278,54 +215,13 @@ tr.innerHTML=`
 tbody.appendChild(tr);
 }
 
-// AUTO HEIGHT
-function autoGrow(el){
-el.style.height="auto";
-el.style.height=el.scrollHeight+"px";
-}
-
-// NUMBER TO WORDS (INDIAN)
-function numberToWords(num){
-
-const a = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten",
-"Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
-
-const b = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
-
-function inWords(n){
-if(n<20) return a[n];
-if(n<100) return b[Math.floor(n/10)] + " " + a[n%10];
-if(n<1000) return a[Math.floor(n/100)] + " Hundred " + inWords(n%100);
-return "";
-}
-
-let result = "";
-
-let crore = Math.floor(num/10000000);
-num %= 10000000;
-
-let lakh = Math.floor(num/100000);
-num %= 100000;
-
-let thousand = Math.floor(num/1000);
-num %= 1000;
-
-let hundred = num;
-
-if(crore) result += inWords(crore) + " Crore ";
-if(lakh) result += inWords(lakh) + " Lakh ";
-if(thousand) result += inWords(thousand) + " Thousand ";
-if(hundred) result += inWords(hundred);
-
-return result.trim();
-}
-
-// CALCULATION
 function calc(){
+
 let sub=0,cgst=0,sgst=0,igst=0;
-let pos=document.getElementById("pos").value;
+let state=document.getElementById("state").value;
 
 document.querySelectorAll("#tbody tr").forEach(r=>{
+
 let qty=r.cells[4].children[0].value||0;
 let rate=r.cells[5].children[0].value||0;
 let gst=r.cells[6].children[0].value||0;
@@ -333,59 +229,63 @@ let gst=r.cells[6].children[0].value||0;
 let amt=qty*rate;
 let gstVal=amt*gst/100;
 
-r.cells[7].innerText=(amt+gstVal).toFixed(2);
+// correct row total
+let rowTotal=amt+gstVal;
+r.cells[7].innerText=rowTotal.toFixed(2);
+
 sub+=amt;
 
-if(pos==="09"){ cgst+=gstVal/2; sgst+=gstVal/2; }
-else{ igst+=gstVal; }
-});
-
-let total=sub+cgst+sgst+igst;
-
-if(docType.value==="sample"){
-sub=0; cgst=0; sgst=0; igst=0; total=0;
+// GST logic
+if(state===""){
+}
+else if(state==="09"){
+cgst+=gstVal/2;
+sgst+=gstVal/2;
+}
+else{
+igst+=gstVal;
 }
 
-cgstRow.style.display = pos==="09" ? "block":"none";
-sgstRow.style.display = pos==="09" ? "block":"none";
-igstRow.style.display = pos==="09" ? "none":"block";
+});
 
+// total before round
+let total=sub+cgst+sgst+igst;
+
+// round
+let rounded=Math.round(total);
+let roundVal=rounded-total;
+
+document.getElementById("roundOff").innerText=
+(roundVal>=0?"+":"")+roundVal.toFixed(2);
+
+// final total
+let finalTotal=rounded;
+
+// GST display
+cgstRow.style.display = state==="09" ? "block":"none";
+sgstRow.style.display = state==="09" ? "block":"none";
+igstRow.style.display = (state && state!=="09") ? "block":"none";
+
+// update UI
 sub.innerText=sub.toFixed(2);
 cgst.innerText=cgst.toFixed(2);
 sgst.innerText=sgst.toFixed(2);
 igst.innerText=igst.toFixed(2);
-grand.innerText=total.toFixed(2);
+grand.innerText=finalTotal.toFixed(2);
 
-/* ✅ FINAL WORDS */
-words.innerText = numberToWords(Math.round(total)) + " Rupees Only";
-}
+words.innerText=finalTotal.toLocaleString('en-IN')+" Rupees Only";
 
-// DOC TYPE
-function updateDocType(){
-if(docType.value==="sample"){
-docTitle.innerText="FREE SAMPLE / PROFORMA INVOICE";
-sampleNote.style.display="block";
-watermark.style.display="block";
+// eway
+if(finalTotal>50000){
+ewayBox.style.display="block";
 }else{
-docTitle.innerText="TAX INVOICE";
-sampleNote.style.display="none";
-watermark.style.display="none";
-}
-calc();
+ewayBox.style.display="none";
 }
 
-// PDF
+}
+
 function preparePDF(){
-let filename = (clientName.value||"Client") + "_" + invno.value + ".pdf";
-
-html2pdf().set({
-margin:[8,8,8,8],
-html2canvas:{scale:2},
-jsPDF:{unit:'mm',format:'a4'}
-}).from(invoice).save(filename);
-
-let c=localStorage.getItem("invCount")||1;
-localStorage.setItem("invCount",parseInt(c)+1);
+html2pdf().from(invoice).save("Invoice.pdf");
 }
 
 </script>

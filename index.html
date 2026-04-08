@@ -110,41 +110,28 @@ Mode of Supply:
 <div class="row">
 <div class="col">
 Place of Supply:
-<input id="place" placeholder="Enter Place">
+<input placeholder="Enter Place">
 </div>
 
 <div class="col">
-State (GST):
+State:
 <select id="state" onchange="calc()">
-<option value="">-- Select --</option>
-<option value="09">Uttar Pradesh (09)</option>
-<option value="07">Delhi (07)</option>
-<option value="06">Haryana (06)</option>
-<option value="27">Maharashtra (27)</option>
-<option value="24">Gujarat (24)</option>
-<option value="29">Karnataka (29)</option>
-<option value="33">Tamil Nadu (33)</option>
-<option value="19">West Bengal (19)</option>
-<option value="36">Telangana (36)</option>
+<option value="">--Select--</option>
+<option value="09">Uttar Pradesh</option>
+<option value="07">Delhi</option>
+<option value="06">Haryana</option>
+<option value="27">Maharashtra</option>
 </select>
 </div>
 </div>
 
 <div class="row" style="margin-top:10px;">
-<div class="col">
-<b>Billed To:</b>
-<textarea></textarea>
-</div>
-
-<div class="col">
-<b>Shipped To:</b>
-<textarea></textarea>
-</div>
+<div class="col"><b>Billed To:</b><textarea></textarea></div>
+<div class="col"><b>Shipped To:</b><textarea></textarea></div>
 </div>
 
 <div id="ewayBox" style="display:none;">
-E-Way Bill No:
-<input>
+E-Way Bill No:<input>
 </div>
 
 <table>
@@ -170,35 +157,26 @@ E-Way Bill No:
 </div>
 
 <div class="footer-box">
-
 <div class="footer-left">
 <b>Bank Details:</b><br>
 UNION BANK OF INDIA<br>
 A/C NO.: 424301010040874<br>
-IFSC CODE: UBIN0542431
+IFSC: UBIN0542431
 </div>
 
 <div class="footer-right">
 <b>Terms & Conditions:</b><br>
 E.& O.E.<br>
 1. Goods once sold will not be taken back.<br>
-2. Interest @ 18% p.a. will be charged if payment is delayed.<br>
+2. Interest @ 18% p.a. if delayed.<br>
 3. Above mentioned item/items are for R&D/Laboratory use ONLY.<br>
 4. Subject to 'FIROZABAD' Jurisdiction only.
 </div>
-
 </div>
 
 <div class="sign">
-<div>
-Receiver's Signature<br>
-__________
-</div>
-
-<div>
-For Siddhi Vinayak Traders<br><br>
-Authorised Signatory
-</div>
+<div>Receiver's Signature<br>__________</div>
+<div>For Siddhi Vinayak Traders<br><br>Authorised Signatory</div>
 </div>
 
 </div>
@@ -229,14 +207,14 @@ tbody.appendChild(tr);
 
 function calc(){
 
-let sub=0,cgst=0,sgst=0,igst=0;
+let subtotal=0, cgst=0, sgst=0, igst=0;
 let state=document.getElementById("state").value;
 
 document.querySelectorAll("#tbody tr").forEach(r=>{
 
-let qty=r.cells[4].children[0].value||0;
-let rate=r.cells[5].children[0].value||0;
-let gst=r.cells[6].children[0].value||0;
+let qty=parseFloat(r.cells[4].children[0].value)||0;
+let rate=parseFloat(r.cells[5].children[0].value)||0;
+let gst=parseFloat(r.cells[6].children[0].value)||0;
 
 let amt=qty*rate;
 let gstVal=amt*gst/100;
@@ -244,7 +222,7 @@ let gstVal=amt*gst/100;
 let rowTotal=amt+gstVal;
 r.cells[7].innerText=rowTotal.toFixed(2);
 
-sub+=amt;
+subtotal+=amt;
 
 if(state==="09"){
 cgst+=gstVal/2;
@@ -255,43 +233,41 @@ igst+=gstVal;
 
 });
 
-let total=sub+cgst+sgst+igst;
+let total=subtotal+cgst+sgst+igst;
 
-// round off
+// ROUND
 let rounded=Math.round(total);
 let roundVal=rounded-total;
 
-roundOff.innerText=(roundVal>=0?"+":"")+roundVal.toFixed(2);
+document.getElementById("roundOff").innerText=
+(roundVal>=0?"+":"")+roundVal.toFixed(2);
 
-// final total
+// FINAL TOTAL
 let finalTotal=rounded;
 
-// GST display
+// DISPLAY
+document.getElementById("sub").innerText=subtotal.toFixed(2);
+document.getElementById("cgst").innerText=cgst.toFixed(2);
+document.getElementById("sgst").innerText=sgst.toFixed(2);
+document.getElementById("igst").innerText=igst.toFixed(2);
+document.getElementById("grand").innerText=finalTotal.toFixed(2);
+
+// GST visibility
 cgstRow.style.display = state==="09" ? "block":"none";
 sgstRow.style.display = state==="09" ? "block":"none";
 igstRow.style.display = (state && state!=="09") ? "block":"none";
 
-// update
-sub.innerText=sub.toFixed(2);
-cgst.innerText=cgst.toFixed(2);
-sgst.innerText=sgst.toFixed(2);
-igst.innerText=igst.toFixed(2);
-grand.innerText=finalTotal.toFixed(2);
+// WORDS
+document.getElementById("words").innerText =
+finalTotal.toLocaleString('en-IN') + " Rupees Only";
 
-words.innerText=finalTotal.toLocaleString('en-IN')+" Rupees Only";
-
-// eway
-if(finalTotal>50000){
-ewayBox.style.display="block";
-}else{
-ewayBox.style.display="none";
-}
+// EWAY
+ewayBox.style.display = finalTotal>50000 ? "block":"none";
 
 }
 
 function preparePDF(){
-let name=(invno.value||"Invoice")+".pdf";
-html2pdf().from(invoice).save(name);
+html2pdf().from(invoice).save("Invoice.pdf");
 }
 
 </script>

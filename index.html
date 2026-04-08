@@ -103,25 +103,14 @@ border:none;
 
 <table style="border:none;">
 <tr>
+
+<!-- LEFT SIDE -->
 <td style="border:none;">
 Invoice No: <input id="invno" value="SVT/26-27/0001"><br>
 
-Date: <input type="text" id="today" readonly>
-</td>
+Date: <input type="text" id="today" readonly><br><br>
 
-<td style="border:none;">
-
-Mode of Supply:
-<input placeholder="Road / Courier">
-
-<br>
-
-<!-- ✅ NEW -->
-Place of Supply:
-<input id="place" placeholder="Enter Place of Supply">
-
-<br>
-
+<!-- ✅ STATE SHIFTED HERE -->
 State:
 <select id="pos" onchange="calc()">
 <option value="">-- Select State --</option>
@@ -139,6 +128,18 @@ State:
 </select>
 
 </td>
+
+<!-- RIGHT SIDE -->
+<td style="border:none;">
+
+Mode of Supply:
+<input placeholder="Road / Courier"><br>
+
+Place of Supply:
+<input id="place" placeholder="Enter Place of Supply">
+
+</td>
+
 </tr>
 </table>
 
@@ -228,7 +229,7 @@ document.getElementById("today").value = formatDate(selectedDates[0]);
 }
 });
 
-/* REST SAME */
+/* EXISTING LOGIC SAME */
 addRow();
 
 function addRow(){
@@ -310,7 +311,6 @@ igstRow.style.display = pos==="09" ? "none":"block";
 
 function preparePDF(){
 let filename=(invno.value||"Invoice")+".pdf";
-
 html2pdf().from(invoice).save(filename);
 }
 

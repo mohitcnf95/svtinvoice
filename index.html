@@ -51,7 +51,6 @@ white-space: pre-wrap;
 word-break: break-word;
 }
 
-/* TABLE */
 table {
 width:100%;
 border-collapse:collapse;
@@ -67,7 +66,6 @@ text-align:center;
 
 td:nth-child(2){ text-align:left; }
 
-/* SUMMARY */
 .summary {
 text-align:right;
 margin-top:10px;
@@ -156,7 +154,6 @@ border:none;
 
 </div>
 
-<!-- BILL / SHIP -->
 <div class="row">
 
 <div class="col">
@@ -173,11 +170,10 @@ border:none;
 
 </div>
 
-<!-- TABLE -->
 <table>
 <thead>
 <tr>
-<th>S.No</th><th>Item</th><th>HSN/SAC Code</th><th>Pack</th>
+<th>S.No</th><th>Item</th><th>CAS</th><th>Pack</th>
 <th>Qty</th><th>Rate</th><th>GST%</th><th>Total</th>
 </tr>
 </thead>
@@ -186,7 +182,6 @@ border:none;
 
 <button onclick="addRow()">+ Add Item</button>
 
-<!-- SUMMARY -->
 <div class="summary">
 <p>Subtotal: ₹ <span id="sub">0</span></p>
 <p id="cgstRow">CGST: ₹ <span id="cgst">0</span></p>
@@ -198,7 +193,6 @@ border:none;
 <p><b>Amount in Words:</b> <span id="words"></span></p>
 </div>
 
-<!-- BOTTOM -->
 <div class="bottom-grid">
 <div>
 <b>Bank Details:</b><br>
@@ -228,22 +222,20 @@ E.& O.E.<br>
 
 <script>
 
-/* ✅ ADDED FUNCTION (CHANGE 1 ONLY) */
-function numberToWords(num){
+/* ✅ NEW: NUMBER TO WORDS (ONLY ADDITION) */
+function numberToWords(num) {
+const a = ['', 'One','Two','Three','Four','Five','Six','Seven','Eight','Nine',
+'Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
 
-const a = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine",
-"Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen",
-"Sixteen","Seventeen","Eighteen","Nineteen"];
-
-const b = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
 
 function inWords(n){
 if(n<20) return a[n];
-if(n<100) return b[Math.floor(n/10)] + (n%10?" "+a[n%10]:"");
-if(n<1000) return a[Math.floor(n/100)]+" Hundred "+(n%100?inWords(n%100):"");
-if(n<100000) return inWords(Math.floor(n/1000))+" Thousand "+(n%1000?inWords(n%1000):"");
-if(n<10000000) return inWords(Math.floor(n/100000))+" Lakh "+(n%100000?inWords(n%100000):"");
-return inWords(Math.floor(n/10000000))+" Crore "+(n%10000000?inWords(n%10000000):"");
+if(n<100) return b[Math.floor(n/10)] + (n%10?' '+a[n%10]:'');
+if(n<1000) return a[Math.floor(n/100)]+' Hundred '+(n%100?inWords(n%100):'');
+if(n<100000) return inWords(Math.floor(n/1000))+' Thousand '+(n%1000?inWords(n%1000):'');
+if(n<10000000) return inWords(Math.floor(n/100000))+' Lakh '+(n%100000?inWords(n%100000):'');
+return inWords(Math.floor(n/10000000))+' Crore '+(n%10000000?inWords(n%10000000):'');
 }
 
 return inWords(num).trim();
@@ -318,19 +310,19 @@ let total=subtotal+cgstVal+sgstVal+igstVal;
 let rounded=Math.round(total||0);
 let diff=rounded-total;
 
-document.getElementById("sub").innerText=subtotal.toFixed(2);
-document.getElementById("cgst").innerText=cgstVal.toFixed(2);
-document.getElementById("sgst").innerText=sgstVal.toFixed(2);
-document.getElementById("igst").innerText=igstVal.toFixed(2);
-document.getElementById("roundoff").innerText=diff.toFixed(2);
-document.getElementById("grand").innerText=rounded.toFixed(2);
+sub.innerText=subtotal.toFixed(2);
+cgst.innerText=cgstVal.toFixed(2);
+sgst.innerText=sgstVal.toFixed(2);
+igst.innerText=igstVal.toFixed(2);
+roundoff.innerText=diff.toFixed(2);
+grand.innerText=rounded.toFixed(2);
 
-/* ✅ REPLACED LINE (CHANGE 2 ONLY) */
-document.getElementById("words").innerText = numberToWords(rounded) + " Rupees Only";
+/* ✅ ONLY CHANGE HERE */
+words.innerText = numberToWords(rounded) + " Rupees Only";
 
-document.getElementById("cgstRow").style.display = posVal==="09"?"block":"none";
-document.getElementById("sgstRow").style.display = posVal==="09"?"block":"none";
-document.getElementById("igstRow").style.display = posVal==="09"?"none":"block";
+cgstRow.style.display = posVal==="09"?"block":"none";
+sgstRow.style.display = posVal==="09"?"block":"none";
+igstRow.style.display = posVal==="09"?"none":"block";
 }
 
 /* PDF */

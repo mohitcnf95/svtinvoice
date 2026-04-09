@@ -45,21 +45,11 @@ background:#f0f0f0;
 padding:4px;
 }
 
-/* ✅ TEXTAREA FIX */
 textarea {
 resize:none;
 white-space: pre-wrap;
 word-break: break-word;
 overflow-wrap: anywhere;
-}
-
-/* ✅ ITEM COLUMN WRAP + AUTO HEIGHT */
-td:nth-child(2) textarea {
-white-space: pre-wrap;
-word-break: break-word;
-overflow-wrap: anywhere;
-height:auto;
-min-height:22px;
 }
 
 /* TABLE */
@@ -78,15 +68,11 @@ text-align:center;
 vertical-align:top;
 }
 
-/* COLUMN WIDTH BALANCE */
-th:nth-child(1){width:5%;}
-th:nth-child(2){width:25%;}
-th:nth-child(3){width:12%;}
-th:nth-child(4){width:12%;}
-th:nth-child(5){width:8%;}
-th:nth-child(6){width:12%;}
-th:nth-child(7){width:8%;}
-th:nth-child(8){width:18%;}
+/* ITEM WRAP */
+td:nth-child(2){
+text-align:left;
+word-break:break-word;
+}
 
 /* SUMMARY */
 .summary {
@@ -124,11 +110,10 @@ color:white;
 border:none;
 }
 
-/* ✅ PDF PRINT TEXT */
-#billPrint, #shipPrint {
-white-space: normal;
-word-break: break-word;
-line-height:1.4;
+/* PRINT BLOCK */
+#printFix {
+white-space:normal;
+word-break:break-word;
 }
 </style>
 </head>
@@ -254,7 +239,7 @@ E.& O.E.<br>
 
 <script>
 
-/* ✅ NUMBER TO WORDS */
+/* NUMBER TO WORDS */
 function numberToWords(num){
 const a=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten',
 'Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
@@ -287,7 +272,10 @@ let n=tbody.rows.length+1;
 
 tr.innerHTML=`
 <td>${n}</td>
-<td><textarea oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea></td>
+<td>
+<textarea oninput="this.nextElementSibling.innerHTML=this.value.replace(/\\n/g,'<br>')"></textarea>
+<div class="itemPrint" style="display:none;"></div>
+</td>
 <td><input></td>
 <td><input></td>
 <td><input type="number"></td>
@@ -346,13 +334,24 @@ shipInput.style.display="none";
 billPrint.style.display="block";
 shipPrint.style.display="block";
 
+// ITEM FIX
+document.querySelectorAll(".itemPrint").forEach((d,i)=>{
+let t=document.querySelectorAll("#tbody textarea")[i];
+d.innerHTML=t.value.replace(/\n/g,"<br>");
+t.style.display="none";
+d.style.display="block";
+});
+
 html2pdf().from(invoice).save(invno.value+".pdf");
 
+// RESTORE
 billInput.style.display="block";
 shipInput.style.display="block";
-
 billPrint.style.display="none";
 shipPrint.style.display="none";
+
+document.querySelectorAll(".itemPrint").forEach(d=>d.style.display="none");
+document.querySelectorAll("#tbody textarea").forEach(t=>t.style.display="block");
 }
 </script>
 

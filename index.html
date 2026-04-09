@@ -350,22 +350,32 @@ igstRow.style.display = posVal==="09"?"none":"block";
 /* PDF */
 function preparePDF(){
 
-billPrint.innerText=billInput.value;
-shipPrint.innerText=shipInput.value;
+// convert textarea → printable div (CRITICAL FIX)
+billPrint.innerHTML = billInput.value
+.replace(/\n/g, "<br>")
+.replace(/ /g, "&nbsp;");
 
-billInput.style.display="none";
-shipInput.style.display="none";
+shipPrint.innerHTML = shipInput.value
+.replace(/\n/g, "<br>")
+.replace(/ /g, "&nbsp;");
 
-billPrint.style.display="block";
-shipPrint.style.display="block";
+// hide textarea
+billInput.style.display = "none";
+shipInput.style.display = "none";
 
-html2pdf().from(invoice).save(invno.value+".pdf");
+// show printable div
+billPrint.style.display = "block";
+shipPrint.style.display = "block";
 
-billInput.style.display="block";
-shipInput.style.display="block";
+// generate PDF
+html2pdf().from(invoice).save(invno.value + ".pdf");
 
-billPrint.style.display="none";
-shipPrint.style.display="none";
+// restore UI
+billInput.style.display = "block";
+shipInput.style.display = "block";
+
+billPrint.style.display = "none";
+shipPrint.style.display = "none";
 }
 
 </script>

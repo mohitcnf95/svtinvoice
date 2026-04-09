@@ -3,60 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVT Invoice Generator</title>
+    <title>SVT Invoice & E-Way Bill Generator</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
-        /* EDITOR UI */
-        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
+        /* MOBILE-FIRST EDITOR UI */
+        body { font-family: -apple-system, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
         .editor-container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h2 { text-align: center; font-size: 18px; margin-top: 0; }
+        h2 { text-align: center; font-size: 18px; color: #1c1e21; margin-top: 0; }
         .field-group { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b4f56; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 15px; background: #f5f6f7; }
         .item-card { border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 10px; background: #fff; }
-        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn-add { background: #e7f3ff; color: #1877f2; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; }
+        .btn-add { background: #e7f3ff; color: #1877f2; margin-top: 5px; }
         .btn-dl { background: #1c1e21; color: white; margin-top: 20px; }
+        #eway_input_wrap { border: 2px solid #ff4d4d; padding: 10px; border-radius: 8px; background: #fff5f5; }
 
         /* A4 PDF OUTPUT STYLING */
         #pdf-export { display: none; width: 210mm; padding: 12mm; background: white; color: black; box-sizing: border-box; }
         .p-header { text-align: center; margin-bottom: 20px; }
         .p-header h2 { margin: 0; font-size: 24px; text-transform: uppercase; }
         .p-header p { margin: 2px 0; font-size: 13px; }
-        
         .p-info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        .p-info-table td { border: 1px solid #000; padding: 5px; font-size: 12px; width: 25%; }
-
+        .p-info-table td { border: 1px solid #000; padding: 5px; font-size: 11px; width: 25%; }
         .p-address-row { display: flex; gap: 15px; margin-bottom: 15px; }
-        /* MODIFICATION 1: Text wrapping for Address Boxes */
-        .p-address-box { 
-            flex: 1; 
-            border: 1px solid #000; 
-            padding: 8px; 
-            min-height: 80px; 
-            font-size: 11px;
-            word-wrap: break-word; 
-            white-space: pre-wrap; 
-            overflow-wrap: break-word;
-        }
-
+        .p-address-box { flex: 1; border: 1px solid #000; padding: 8px; min-height: 80px; font-size: 11px; word-wrap: break-word; white-space: pre-wrap; }
         .p-item-table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
         .p-item-table th, .p-item-table td { border: 1px solid #000; padding: 6px; font-size: 10px; text-align: center; overflow-wrap: break-word; }
         .p-item-table th { background: #f2f2f2; }
-        /* MODIFICATION 1: Text wrapping for Item column */
-        .p-item-table td:nth-child(2) { text-align: left; white-space: normal; }
-
+        .p-item-table td:nth-child(2) { text-align: left; }
         .p-totals { text-align: right; margin-top: 15px; font-size: 13px; line-height: 1.6; }
         .p-grand-total { font-size: 16px; font-weight: bold; border-top: 1px solid #000; padding-top: 5px; display: inline-block; min-width: 220px; }
-
         .p-bottom-row { display: flex; justify-content: space-between; margin-top: 20px; border: 1px solid #000; }
         .p-bottom-box { padding: 8px; font-size: 10px; flex: 1; border-right: 1px solid #000; }
         .p-bottom-box:last-child { border-right: none; }
-
         .p-footer { display: flex; justify-content: space-between; margin-top: 50px; font-size: 13px; }
     </style>
 </head>
@@ -67,50 +51,21 @@
     <div class="field-group"><label>Invoice No:</label><input id="inv_no" value="SVT/26-27/0001"></div>
     <div class="field-group"><label>Date:</label><input id="inv_date"></div>
     <div class="field-group">
-        <label>State (Place of Supply):</label>
-<select id="inv_state">
-    <option value="01">Jammu & Kashmir (01)</option>
-    <option value="02">Himachal Pradesh (02)</option>
-    <option value="03">Punjab (03)</option>
-    <option value="04">Chandigarh (04)</option>
-    <option value="05">Uttarakhand (05)</option>
-    <option value="06">Haryana (06)</option>
-    <option value="07">Delhi (07)</option>
-    <option value="08">Rajasthan (08)</option>
-    <option value="09" selected>Uttar Pradesh (09)</option>
-    <option value="10">Bihar (10)</option>
-    <option value="11">Sikkim (11)</option>
-    <option value="12">Arunachal Pradesh (12)</option>
-    <option value="13">Nagaland (13)</option>
-    <option value="14">Manipur (14)</option>
-    <option value="15">Mizoram (15)</option>
-    <option value="16">Tripura (16)</option>
-    <option value="17">Meghalaya (17)</option>
-    <option value="18">Assam (18)</option>
-    <option value="19">West Bengal (19)</option>
-    <option value="20">Jharkhand (20)</option>
-    <option value="21">Odisha (21)</option>
-    <option value="22">Chhattisgarh (22)</option>
-    <option value="23">Madhya Pradesh (23)</option>
-    <option value="24">Gujarat (24)</option>
-    <option value="25">Daman & Diu (25)</option>
-    <option value="26">Dadra & Nagar Haveli (26)</option>
-    <option value="27">Maharashtra (27)</option>
-    <option value="30">Goa (30)</option>
-    <option value="31">Lakshadweep (31)</option>
-    <option value="32">Kerala (32)</option>
-    <option value="33">Tamil Nadu (33)</option>
-    <option value="34">Puducherry (34)</option>
-    <option value="35">Andaman & Nicobar Islands (35)</option>
-    <option value="36">Telangana (36)</option>
-    <option value="37">Andhra Pradesh (37)</option>
-    <option value="38">Ladakh (38)</option>
-</select>
+        <label>State:</label>
+        <select id="inv_state" onchange="calculateLive()">
+            <option value="09" selected>Uttar Pradesh (09)</option>
+            <option value="07">Delhi (07)</option>
+            </select>
     </div>
     <div class="field-group"><label>Mode:</label><input id="inv_mode"></div>
     <div class="field-group"><label>Place:</label><input id="inv_place" value="Firozabad"></div>
     <div class="field-group"><label>Billed To:</label><textarea id="inv_billed"></textarea></div>
     <div class="field-group"><label>Shipped To:</label><textarea id="inv_shipped"></textarea></div>
+
+    <div class="field-group" id="eway_input_wrap" style="display:none;">
+        <label style="color:red;">E-Way Bill Number (Value > ₹50,000):</label>
+        <input id="inv_eway" placeholder="Enter 12-digit E-Way No.">
+    </div>
 
     <label>Items:</label>
     <div id="item-list"></div>
@@ -120,7 +75,6 @@
 
 <div id="pdf-export">
     <div class="p-header">
-        <img src="logo.png" style="width: 50px; margin-bottom: 5px;" onerror="this.style.display='none'">
         <h2>SIDDHI VINAYAK TRADERS</h2>
         <p>12/306, Arya Nagar, Firozabad - 283203</p>
         <p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722 | svtjp11@gmail.com</p>
@@ -130,7 +84,7 @@
     <table class="p-info-table">
         <tr><td><b>Invoice No:</b></td><td id="p_no"></td><td><b>Mode:</b></td><td id="p_mode"></td></tr>
         <tr><td><b>Date:</b></td><td id="p_date"></td><td><b>Place:</b></td><td id="p_place"></td></tr>
-        <tr><td><b>State:</b></td><td id="p_state" colspan="3"></td></tr>
+        <tr><td><b>State:</b></td><td id="p_state"></td><td><b>E-Way Bill:</b></td><td id="p_eway_no">N/A</td></tr>
     </table>
 
     <div class="p-address-row">
@@ -139,44 +93,21 @@
     </div>
 
     <table class="p-item-table">
-        <thead>
-            <tr>
-                <th style="width: 8%;">S.No</th>
-                <th style="width: 32%;">Item</th>
-                <th style="width: 15%;">HSN/SAC CODE</th>
-                <th style="width: 10%;">Pack</th>
-                <th style="width: 8%;">Qty</th>
-                <th style="width: 10%;">Rate</th>
-                <th style="width: 7%;">GST%</th>
-                <th style="width: 10%;">Total</th>
-            </tr>
-        </thead>
+        <thead><tr><th style="width:8%">S.No</th><th style="width:32%">Item</th><th style="width:15%">CAS</th><th style="width:10%">Pack</th><th style="width:8%">Qty</th><th style="width:10%">Rate</th><th style="width:7%">GST%</th><th style="width:10%">Total</th></tr></thead>
         <tbody id="p_body"></tbody>
     </table>
 
     <div class="p-totals">
-    <p>Subtotal: ₹ <span id="p_sub">0.00</span></p>
-    <div id="p_tax_container"></div>
-    <p>Round Off: ₹ <span id="p_round">0.00</span></p>
-    <div class="p-grand-total">Grand Total: ₹ <span id="p_grand">0.00</span></div>
-    <p style="margin-top: 5px;"><b>Amount in Words:</b> <span id="p_words"></span></p>
-</div>
+        <p>Subtotal: ₹ <span id="p_sub">0.00</span></p>
+        <div id="p_tax_container"></div>
+        <p>Round Off: ₹ <span id="p_round">0.00</span></p>
+        <div class="p-grand-total">Grand Total: ₹ <span id="p_grand">0.00</span></div>
+        <p style="margin-top: 5px;"><b>Amount in Words:</b> <span id="p_words"></span></p>
+    </div>
 
     <div class="p-bottom-row">
-        <div class="p-bottom-box">
-            <b>Bank Details:</b><br>
-            UNION BANK OF INDIA<br>
-            A/C NO.: 424301010040874<br>
-            IFSC: UBIN0542431
-        </div>
-        <div class="p-bottom-box">
-            <b>Terms & Conditions:</b><br>
-            E.& O.E.<br>
-            1. Goods once sold will not be taken back.<br>
-            2. Interest @ 18% p.a. will be charged if payment is delayed.<br>
-            3. Items are for R&D/Laboratory use ONLY.<br>
-            4. Subject to 'FIROZABAD' Jurisdiction only.
-        </div>
+        <div class="p-bottom-box"><b>Bank Details:</b><br>UNION BANK OF INDIA<br>A/C NO.: 424301010040874<br>IFSC: UBIN0542431</div>
+        <div class="p-bottom-box"><b>Terms & Conditions:</b><br>E.& O.E.<br>1. Goods once sold not back.<br>2. Interest @ 18% p.a.<br>3. R&D/Lab use ONLY.<br>4. Firozabad Jurisdiction.</div>
     </div>
 
     <div class="p-footer">
@@ -192,106 +123,92 @@
         const div = document.createElement('div');
         div.className = 'item-card';
         div.innerHTML = `
-            <textarea placeholder="Item Description" class="i_name" style="margin-bottom:8px"></textarea>
+            <textarea placeholder="Item Description" class="i_name" style="margin-bottom:8px" oninput="calculateLive()"></textarea>
             <div style="display:flex; gap:5px; margin-bottom:8px;">
                 <input placeholder="CAS" class="i_cas" style="flex:1">
                 <input placeholder="Pack" class="i_pack" style="flex:1">
             </div>
             <div style="display:flex; gap:5px;">
-                <input type="number" placeholder="Qty" class="i_qty" style="flex:1">
-                <input type="number" placeholder="Rate" class="i_rate" style="flex:1">
-                <input type="number" value="18" class="i_gst" style="flex:0.8">
+                <input type="number" placeholder="Qty" class="i_qty" style="flex:1" oninput="calculateLive()">
+                <input type="number" placeholder="Rate" class="i_rate" style="flex:1" oninput="calculateLive()">
+                <input type="number" value="18" class="i_gst" style="flex:0.8" oninput="calculateLive()">
             </div>`;
         document.getElementById('item-list').appendChild(div);
     }
     addItem();
 
-    /* MODIFICATION 2: Indian Numbering System Logic */
+    function calculateLive() {
+        let sub = 0, tax = 0;
+        document.querySelectorAll('.item-card').forEach(row => {
+            const q = parseFloat(row.querySelector('.i_qty').value) || 0;
+            const r = parseFloat(row.querySelector('.i_rate').value) || 0;
+            const g = parseFloat(row.querySelector('.i_gst').value) || 0;
+            sub += (q * r);
+            tax += (q * r * g / 100);
+        });
+        const total = Math.round(sub + tax);
+        document.getElementById('eway_input_wrap').style.display = total > 50000 ? 'block' : 'none';
+        return total;
+    }
+
     function indianNumToWords(num) {
         const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
         const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-        
-        function format(v) {
+        const format = (v) => {
             if (v < 20) return a[v];
             if (v < 100) return b[Math.floor(v / 10)] + ' ' + a[v % 10];
             if (v < 1000) return a[Math.floor(v / 100)] + ' Hundred ' + format(v % 100);
             if (v < 100000) return format(Math.floor(v / 1000)) + ' Thousand ' + format(v % 1000);
             if (v < 10000000) return format(Math.floor(v / 100000)) + ' Lakh ' + format(v % 100000);
             return format(Math.floor(v / 10000000)) + ' Crore ' + format(v % 10000000);
-        }
+        };
         return num > 0 ? (format(num) + "Rupees Only").replace(/\s+/g, ' ') : "Zero Rupees Only";
     }
 
     function downloadPDF() {
-    const stateSelect = document.getElementById('inv_state');
-    const stateValue = stateSelect.value;
-    
-    document.getElementById('p_no').innerText = document.getElementById('inv_no').value;
-    document.getElementById('p_date').innerText = document.getElementById('inv_date').value;
-    document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
-    document.getElementById('p_place').innerText = document.getElementById('inv_place').value;
-    document.getElementById('p_state').innerText = stateSelect.options[stateSelect.selectedIndex].text;
-    document.getElementById('p_billed').innerText = document.getElementById('inv_billed').value;
-    document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
+        const stateVal = document.getElementById('inv_state').value;
+        const ewayVal = document.getElementById('inv_eway').value;
+        
+        document.getElementById('p_no').innerText = document.getElementById('inv_no').value;
+        document.getElementById('p_date').innerText = document.getElementById('inv_date').value;
+        document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
+        document.getElementById('p_place').innerText = document.getElementById('inv_place').value;
+        document.getElementById('p_state').innerText = document.getElementById('inv_state').options[document.getElementById('inv_state').selectedIndex].text;
+        document.getElementById('p_billed').innerText = document.getElementById('inv_billed').value;
+        document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
 
-    const pBody = document.getElementById('p_body');
-    pBody.innerHTML = '';
-    let sub = 0, taxTotal = 0;
+        const pBody = document.getElementById('p_body');
+        pBody.innerHTML = '';
+        let sub = 0, taxTotal = 0;
 
-    document.querySelectorAll('.item-card').forEach((row, i) => {
-        const qty = parseFloat(row.querySelector('.i_qty').value) || 0;
-        const rate = parseFloat(row.querySelector('.i_rate').value) || 0;
-        const gst = parseFloat(row.querySelector('.i_gst').value) || 0;
-        const lineSub = qty * rate;
-        const lineTax = lineSub * (gst / 100);
-        sub += lineSub; taxTotal += lineTax;
+        document.querySelectorAll('.item-card').forEach((row, i) => {
+            const q = parseFloat(row.querySelector('.i_qty').value) || 0;
+            const r = parseFloat(row.querySelector('.i_rate').value) || 0;
+            const g = parseFloat(row.querySelector('.i_gst').value) || 0;
+            const lineSub = q * r;
+            const lineTax = lineSub * (g / 100);
+            sub += lineSub; taxTotal += lineTax;
+            pBody.innerHTML += `<tr><td>${i+1}</td><td style="text-align:left;">${row.querySelector('.i_name').value}</td><td>${row.querySelector('.i_cas').value}</td><td>${row.querySelector('.i_pack').value}</td><td>${q}</td><td>${r.toFixed(2)}</td><td>${g}%</td><td>${(lineSub+lineTax).toFixed(2)}</td></tr>`;
+        });
 
-        pBody.innerHTML += `<tr>
-            <td>${i+1}</td>
-            <td style="text-align:left;">${row.querySelector('.i_name').value}</td>
-            <td>${row.querySelector('.i_cas').value}</td>
-            <td>${row.querySelector('.i_pack').value}</td>
-            <td>${qty}</td>
-            <td>${rate.toFixed(2)}</td>
-            <td>${gst}%</td>
-            <td>${(lineSub+lineTax).toFixed(2)}</td>
-        </tr>`;
-    });
+        const total = sub + taxTotal;
+        const rounded = Math.round(total);
+        document.getElementById('p_sub').innerText = sub.toFixed(2);
+        document.getElementById('p_grand').innerText = rounded.toFixed(2);
+        document.getElementById('p_round').innerText = (rounded - total).toFixed(2);
+        document.getElementById('p_words').innerText = indianNumToWords(rounded);
 
-    const rounded = Math.round(sub + taxTotal);
-    document.getElementById('p_sub').innerText = sub.toFixed(2);
-    
-    // MODIFIED TAX LOGIC
-    const taxContainer = document.getElementById('p_tax_container');
-    taxContainer.innerHTML = ''; // Clear previous
+        // Tax Logic
+        const taxContainer = document.getElementById('p_tax_container');
+        taxContainer.innerHTML = stateVal === "09" ? `<p>CGST: ₹ ${(taxTotal/2).toFixed(2)}</p><p>SGST: ₹ ${(taxTotal/2).toFixed(2)}</p>` : `<p>IGST: ₹ ${taxTotal.toFixed(2)}</p>`;
 
-    if (stateValue === "09") {
-        // Show only CGST and SGST for Uttar Pradesh
-        taxContainer.innerHTML = `
-            <p>CGST: ₹ ${(taxTotal / 2).toFixed(2)}</p>
-            <p>SGST: ₹ ${(taxTotal / 2).toFixed(2)}</p>
-        `;
-    } else {
-        // Show only IGST for all other states
-        taxContainer.innerHTML = `<p>IGST: ₹ ${taxTotal.toFixed(2)}</p>`;
+        // E-Way Bill Number logic
+        document.getElementById('p_eway_no').innerText = (rounded > 50000) ? (ewayVal || "REQUIRED") : "N/A";
+
+        const element = document.getElementById('pdf-export');
+        element.style.display = 'block';
+        html2pdf().from(element).set({ margin: 0, filename: 'Invoice.pdf', html2canvas: { scale: 3 }, jsPDF: { format: 'a4' } }).save().then(() => { element.style.display = 'none'; });
     }
-
-    document.getElementById('p_round').innerText = (rounded - (sub + taxTotal)).toFixed(2);
-    document.getElementById('p_grand').innerText = rounded.toFixed(2);
-    document.getElementById('p_words').innerText = indianNumToWords(rounded);
-
-    const element = document.getElementById('pdf-export');
-    element.style.display = 'block';
-    
-    html2pdf().from(element).set({ 
-        margin: 0, 
-        filename: 'Invoice.pdf', 
-        html2canvas: { scale: 3 }, 
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-    }).save().then(() => { 
-        element.style.display = 'none'; 
-    });
-}
 </script>
 </body>
 </html>

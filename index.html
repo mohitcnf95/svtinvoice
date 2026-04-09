@@ -10,100 +10,105 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
-        :root { --primary-bg: #f5f5f5; --input-bg: #f0f0f0; --border-color: #000; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--primary-bg); margin: 0; padding: 20px; }
+        :root { --primary: #000; --bg: #f8f9fa; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 10px; }
 
+        /* Mobile Responsive Container */
         .container {
-            max-width: 210mm;
+            max-width: 100%;
             margin: auto;
             background: white;
-            padding: 10mm;
+            padding: 15px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
-        .header h2 { margin: 5px 0; }
-        .header p { margin: 2px 0; font-size: 13px; }
+        /* Header Fix for Mobile */
+        .header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+        .header h2 { font-size: 1.2rem; margin: 5px 0; }
+        .header p { font-size: 11px; margin: 2px 0; }
 
-        .row { display: flex; justify-content: space-between; gap: 30px; margin-bottom: 15px; }
-        .col { flex: 1; }
+        /* Responsive Grid: Stacks on mobile, Side-by-side on desktop */
+        .row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
+        .col { flex: 1; min-width: 250px; }
 
-        .field { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-        .field label { min-width: 100px; font-weight: bold; font-size: 13px; }
+        .field { display: flex; flex-direction: column; margin-bottom: 8px; }
+        .field label { font-size: 12px; font-weight: bold; margin-bottom: 3px; }
 
         input, textarea, select {
             width: 100%;
-            border: 1px solid #ddd;
-            font-size: 13px;
-            background: var(--input-bg);
-            padding: 6px;
-            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px; /* Larger for better mobile tapping */
+            padding: 8px;
+            box-sizing: border-box;
+            background: #fff;
         }
 
-        textarea { height: 60px; resize: none; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; table-layout: fixed; }
-        th, td { border: 1px solid var(--border-color); padding: 6px; font-size: 12px; text-align: center; }
-        th { background: #eee; }
-        td:nth-child(2) { text-align: left; width: 30%; }
+        /* Table Responsive: Allows scrolling on tiny screens */
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; } /* Ensures table doesn't collapse too much */
+        th, td { border: 1px solid #000; padding: 6px; font-size: 11px; text-align: center; }
+        
+        .item-desc { min-height: 40px; font-size: 12px; }
 
         .btn-add {
+            width: 100%;
             margin-top: 10px;
-            padding: 8px 15px;
+            padding: 12px;
             background: #28a745;
             color: white;
             border: none;
-            cursor: pointer;
-            border-radius: 4px;
+            border-radius: 5px;
+            font-weight: bold;
         }
 
         .summary { text-align: right; margin-top: 20px; }
-        .summary p { margin: 4px 0; font-size: 14px; }
-        .summary h3 { margin: 10px 0; color: #d9534f; }
-
+        .summary p { margin: 5px 0; font-size: 13px; }
+        
+        /* Bank/Terms Grid */
         .bottom-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr; /* Stacked on mobile */
+            gap: 10px;
             margin-top: 20px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #000;
         }
-        .bottom-grid div { padding: 10px; font-size: 11px; line-height: 1.4; border-right: 1px solid var(--border-color); }
-        .bottom-grid div:last-child { border-right: none; }
+        @media (min-width: 600px) { .bottom-grid { grid-template-columns: 1fr 1fr; } }
+        .bottom-grid div { padding: 8px; font-size: 10px; }
 
-        .footer { display: flex; justify-content: space-between; margin-top: 40px; font-size: 13px; }
+        .footer { display: flex; justify-content: space-between; margin-top: 30px; font-size: 12px; }
 
         #downloadBtn {
+            position: sticky;
+            bottom: 20px;
+            width: 100%;
+            max-width: 400px;
             display: block;
             margin: 20px auto;
             padding: 15px;
-            width: 210mm;
             background: #000;
-            color: white;
+            color: #fff;
             border: none;
-            cursor: pointer;
+            border-radius: 50px;
             font-weight: bold;
-            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 100;
         }
 
-        /* Print formatting */
-        .print-content { white-space: pre-wrap; word-wrap: break-word; font-size: 13px; display: none; }
+        /* PRINT ONLY CLASSES */
+        .print-content { display: none; white-space: pre-wrap; }
         
-        @media print {
-            #downloadBtn, .btn-add { display: none; }
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; }
-        }
+        /* This forces the PDF to look like A4 even if the screen is small */
+        .pdf-mode { width: 210mm !important; padding: 10mm !important; }
     </style>
 </head>
-
 <body>
 
 <div id="invoice" class="container">
     <div class="header">
-        <img src="logo.png" alt="Logo" style="width:70px; height:auto; margin-bottom:5px;" onerror="this.style.display='none'">
+        <img src="logo.png" alt="Logo" style="width:50px;" onerror="this.style.display='none'">
         <h2>SIDDHI VINAYAK TRADERS</h2>
         <p>12/306, Arya Nagar, Firozabad - 283203</p>
-        <p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722 | svtjp11@gmail.com</p>
+        <p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722</p>
         <h3>TAX INVOICE</h3>
     </div>
 
@@ -114,50 +119,50 @@
             <div class="field">
                 <label>State:</label>
                 <select id="pos" onchange="calc()">
-                    <option value="">-- Select State --</option>
-                    <option value="09" selected>Uttar Pradesh (09)</option>
+                    <option value="09">Uttar Pradesh (09)</option>
                     <option value="07">Delhi (07)</option>
                     <option value="06">Haryana (06)</option>
-                    <option value="27">Maharashtra (27)</option>
                 </select>
             </div>
         </div>
         <div class="col">
-            <div class="field"><label>Mode:</label><input placeholder="e.g. Hand Delivery"></div>
-            <div class="field"><label>Place:</label><input placeholder="e.g. Firozabad"></div>
+            <div class="field"><label>Mode of Transport:</label><input id="mode"></div>
+            <div class="field"><label>Place of Supply:</label><input id="place"></div>
         </div>
     </div>
 
     <div class="row">
         <div class="col">
-            <label><b>Billed To:</b></label>
-            <textarea id="billInput" placeholder="Name and Address"></textarea>
+            <label style="font-size:12px; font-weight:bold;">Billed To:</label>
+            <textarea id="billInput" placeholder="Name & Address"></textarea>
             <div id="billPrint" class="print-content"></div>
         </div>
         <div class="col">
-            <label><b>Shipped To:</b></label>
+            <label style="font-size:12px; font-weight:bold;">Shipped To:</label>
             <textarea id="shipInput" placeholder="Shipping Address"></textarea>
             <div id="shipPrint" class="print-content"></div>
         </div>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th style="width:40px">S.No</th>
-                <th>Item Description</th>
-                <th style="width:80px">CAS No.</th>
-                <th style="width:60px">Pack</th>
-                <th style="width:50px">Qty</th>
-                <th style="width:80px">Rate</th>
-                <th style="width:50px">GST%</th>
-                <th style="width:100px">Total (₹)</th>
-            </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-    </table>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:30px">S.N</th>
+                    <th>Item Description</th>
+                    <th style="width:70px">CAS</th>
+                    <th style="width:50px">Pack</th>
+                    <th style="width:40px">Qty</th>
+                    <th style="width:60px">Rate</th>
+                    <th style="width:40px">GST</th>
+                    <th style="width:80px">Total</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
 
-    <button class="btn-add" onclick="addRow()">+ Add New Item</button>
+    <button class="btn-add" onclick="addRow()">+ Add Item</button>
 
     <div class="summary">
         <p>Subtotal: ₹ <span id="sub">0.00</span></p>
@@ -165,68 +170,33 @@
         <div id="sgstRow"><p>SGST: ₹ <span id="sgst">0.00</span></p></div>
         <div id="igstRow" style="display:none;"><p>IGST: ₹ <span id="igst">0.00</span></p></div>
         <p>Round Off: ₹ <span id="roundoff">0.00</span></p>
-        <h3>Grand Total: ₹ <span id="grand">0.00</span></h3>
-        <p><b>Amount in Words:</b> <span id="words">Zero Rupees Only</span></p>
+        <h3 style="margin:5px 0;">Grand Total: ₹ <span id="grand">0.00</span></h3>
+        <p style="font-size:11px;"><b>Words:</b> <span id="words">Zero Rupees Only</span></p>
     </div>
 
     <div class="bottom-grid">
-        <div>
-            <b>BANK DETAILS:</b><br>
-            UNION BANK OF INDIA<br>
-            A/C NO.: 424301010040874<br>
-            IFSC: UBIN0542431
-        </div>
-        <div>
-            <b>TERMS & CONDITIONS:</b><br>
-            1. Goods once sold will not be taken back.<br>
-            2. Interest @ 18% p.a. will be charged if payment is delayed.<br>
-            3. Items are for R&D/Laboratory use ONLY.<br>
-            4. Subject to 'FIROZABAD' Jurisdiction only.
-        </div>
+        <div><b>BANK:</b> UNION BANK OF INDIA | A/C: 424301010040874 | IFSC: UBIN0542431</div>
+        <div><b>TERMS:</b> 1. No returns. 2. 18% Interest on delay. 3. Lab use only.</div>
     </div>
 
     <div class="footer">
-        <div>Receiver's Signature<br><br>____________________</div>
-        <div style="text-align: right;">
-            For <b>Siddhi Vinayak Traders</b><br><br><br>
-            Authorised Signatory
-        </div>
+        <div>Receiver's Sign</div>
+        <div style="text-align:right">For Siddhi Vinayak Traders</div>
     </div>
 </div>
 
-<button id="downloadBtn" onclick="preparePDF()">Download PDF Invoice</button>
+<button id="downloadBtn" onclick="preparePDF()">DOWNLOAD PDF</button>
 
 <script>
-    // 1. Initialize Date Picker
     flatpickr("#today", { dateFormat: "d-M-Y", defaultDate: new Date() });
 
-    // 2. Number to Words Function
-    function numberToWords(num) {
-        const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
-        const b = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
-        function inWords(n) {
-            if (n < 20) return a[n];
-            if (n < 100) return b[Math.floor(n/10)] + ' ' + a[n%10];
-            if (n < 1000) return a[Math.floor(n/100)] + ' Hundred ' + inWords(n%100);
-            if (n < 100000) return inWords(Math.floor(n/1000)) + ' Thousand ' + inWords(n%1000);
-            if (n < 10000000) return inWords(Math.floor(n/100000)) + ' Lakh ' + inWords(n%100000);
-            return inWords(Math.floor(n/10000000)) + ' Crore ' + inWords(n%10000000);
-        }
-        return num > 0 ? inWords(num).replace(/\s+/g, ' ').trim() : "Zero";
-    }
-
-    // 3. Add Row Function
     function addRow() {
         const tbody = document.getElementById("tbody");
         const n = tbody.rows.length + 1;
         const tr = document.createElement("tr");
-
         tr.innerHTML = `
             <td>${n}</td>
-            <td>
-                <textarea class="item-desc"></textarea>
-                <div class="itemPrint print-content"></div>
-            </td>
+            <td><textarea class="item-desc" oninput="calc()"></textarea><div class="itemPrint print-content"></div></td>
             <td><input class="cas"></td>
             <td><input class="pack"></td>
             <td><input type="number" class="qty" value="0" oninput="calc()"></td>
@@ -236,92 +206,75 @@
         `;
         tbody.appendChild(tr);
     }
-
-    // Add first row on load
     addRow();
 
-    // 4. Calculation Engine
     function calc() {
-        let subTotal = 0, cgstTotal = 0, sgstTotal = 0, igstTotal = 0;
-        const posValue = document.getElementById("pos").value;
+        let sub = 0, cgst = 0, sgst = 0, igst = 0;
+        const pos = document.getElementById("pos").value;
 
         document.querySelectorAll("#tbody tr").forEach(row => {
-            const qty = parseFloat(row.querySelector(".qty").value) || 0;
-            const rate = parseFloat(row.querySelector(".rate").value) || 0;
-            const gstp = parseFloat(row.querySelector(".gstp").value) || 0;
-
-            const taxableAmt = qty * rate;
-            const taxAmt = taxableAmt * (gstp / 100);
+            const q = parseFloat(row.querySelector(".qty").value) || 0;
+            const r = parseFloat(row.querySelector(".rate").value) || 0;
+            const g = parseFloat(row.querySelector(".gstp").value) || 0;
+            const taxAmt = (q * r) * (g / 100);
             
-            row.querySelector(".rowTotal").innerText = (taxableAmt + taxAmt).toFixed(2);
-            subTotal += taxableAmt;
-
-            if (posValue === "09") {
-                cgstTotal += taxAmt / 2;
-                sgstTotal += taxAmt / 2;
-            } else if (posValue !== "") {
-                igstTotal += taxAmt;
-            }
+            row.querySelector(".rowTotal").innerText = ((q * r) + taxAmt).toFixed(2);
+            sub += (q * r);
+            if (pos === "09") { cgst += taxAmt/2; sgst += taxAmt/2; } else { igst += taxAmt; }
         });
 
-        const rawGrand = subTotal + cgstTotal + sgstTotal + igstTotal;
-        const roundedGrand = Math.round(rawGrand);
-        const roundOff = roundedGrand - rawGrand;
-
-        document.getElementById("sub").innerText = subTotal.toFixed(2);
-        document.getElementById("cgst").innerText = cgstTotal.toFixed(2);
-        document.getElementById("sgst").innerText = sgstTotal.toFixed(2);
-        document.getElementById("igst").innerText = igstTotal.toFixed(2);
-        document.getElementById("roundoff").innerText = roundOff.toFixed(2);
-        document.getElementById("grand").innerText = roundedGrand.toFixed(2);
-        document.getElementById("words").innerText = numberToWords(roundedGrand) + " Rupees Only";
-
-        // UI Toggle for GST types
-        document.getElementById("cgstRow").style.display = (posValue === "09") ? "block" : "none";
-        document.getElementById("sgstRow").style.display = (posValue === "09") ? "block" : "none";
-        document.getElementById("igstRow").style.display = (posValue !== "09" && posValue !== "") ? "block" : "none";
+        const total = sub + cgst + sgst + igst;
+        const rounded = Math.round(total);
+        
+        document.getElementById("sub").innerText = sub.toFixed(2);
+        document.getElementById("cgst").innerText = cgst.toFixed(2);
+        document.getElementById("sgst").innerText = sgst.toFixed(2);
+        document.getElementById("igst").innerText = igst.toFixed(2);
+        document.getElementById("roundoff").innerText = (rounded - total).toFixed(2);
+        document.getElementById("grand").innerText = rounded.toFixed(2);
+        
+        document.getElementById("cgstRow").style.display = pos === "09" ? "block" : "none";
+        document.getElementById("sgstRow").style.display = pos === "09" ? "block" : "none";
+        document.getElementById("igstRow").style.display = pos !== "09" ? "block" : "none";
     }
 
-    // 5. PDF Preparation & Download
     function preparePDF() {
-        const invoice = document.getElementById("invoice");
+        const inv = document.getElementById("invoice");
         
-        // Handle textareas for PDF rendering
-        const inputs = [
-            {input: 'billInput', print: 'billPrint'},
-            {input: 'shipInput', print: 'shipPrint'}
-        ];
-
-        inputs.forEach(item => {
-            const el = document.getElementById(item.input);
-            const pr = document.getElementById(item.print);
-            pr.innerHTML = el.value.replace(/\n/g, "<br>");
-            el.style.display = "none";
-            pr.style.display = "block";
-        });
+        // 1. Switch to Print Mode
+        inv.classList.add("pdf-mode");
+        
+        // Copy Textareas to Divs for clean PDF
+        document.getElementById("billPrint").innerText = document.getElementById("billInput").value;
+        document.getElementById("shipPrint").innerText = document.getElementById("shipInput").value;
+        document.getElementById("billInput").style.display = "none";
+        document.getElementById("shipInput").style.display = "none";
+        document.getElementById("billPrint").style.display = "block";
+        document.getElementById("shipPrint").style.display = "block";
 
         document.querySelectorAll("#tbody tr").forEach(row => {
             const ta = row.querySelector(".item-desc");
             const div = row.querySelector(".itemPrint");
-            div.innerHTML = ta.value.replace(/\n/g, "<br>");
+            div.innerText = ta.value;
             ta.style.display = "none";
             div.style.display = "block";
         });
 
+        // 2. Generate PDF
         const opt = {
-            margin: 5,
+            margin: 0,
             filename: document.getElementById("invno").value + '.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
+            html2canvas: { scale: 3, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(invoice).save().then(() => {
-            // Restore visibility
-            inputs.forEach(item => {
-                document.getElementById(item.input).style.display = "block";
-                document.getElementById(item.print).style.display = "none";
-            });
+        html2pdf().set(opt).from(inv).save().then(() => {
+            // 3. Reset UI
+            inv.classList.remove("pdf-mode");
+            document.getElementById("billInput").style.display = "block";
+            document.getElementById("shipInput").style.display = "block";
+            document.getElementById("billPrint").style.display = "none";
+            document.getElementById("shipPrint").style.display = "none";
             document.querySelectorAll(".item-desc").forEach(ta => ta.style.display = "block");
             document.querySelectorAll(".itemPrint").forEach(div => div.style.display = "none");
         });

@@ -51,6 +51,23 @@ white-space: pre-wrap;
 word-break: break-word;
 }
 
+/* ✅ WRAP FIX (SAFE) */
+#billPrint, #shipPrint,
+#billInput, #shipInput {
+white-space: pre-wrap !important;
+word-break: break-word !important;
+overflow-wrap: anywhere !important;
+}
+
+/* ✅ ITEM COLUMN WRAP */
+td:nth-child(2),
+td:nth-child(2) textarea {
+white-space: pre-wrap !important;
+word-break: break-word !important;
+overflow-wrap: anywhere !important;
+}
+
+/* TABLE */
 table {
 width:100%;
 border-collapse:collapse;
@@ -66,6 +83,7 @@ text-align:center;
 
 td:nth-child(2){ text-align:left; }
 
+/* SUMMARY */
 .summary {
 text-align:right;
 margin-top:10px;
@@ -154,22 +172,24 @@ border:none;
 
 </div>
 
+<!-- BILL / SHIP -->
 <div class="row">
 
 <div class="col">
 <b>Billed To:</b>
 <textarea id="billInput"></textarea>
-<div id="billPrint" style="display:none; white-space:pre-wrap;"></div>
+<div id="billPrint" style="display:none;"></div>
 </div>
 
 <div class="col">
 <b>Shipped To:</b>
 <textarea id="shipInput"></textarea>
-<div id="shipPrint" style="display:none; white-space:pre-wrap;"></div>
+<div id="shipPrint" style="display:none;"></div>
 </div>
 
 </div>
 
+<!-- TABLE -->
 <table>
 <thead>
 <tr>
@@ -182,6 +202,7 @@ border:none;
 
 <button onclick="addRow()">+ Add Item</button>
 
+<!-- SUMMARY -->
 <div class="summary">
 <p>Subtotal: ₹ <span id="sub">0</span></p>
 <p id="cgstRow">CGST: ₹ <span id="cgst">0</span></p>
@@ -193,6 +214,7 @@ border:none;
 <p><b>Amount in Words:</b> <span id="words"></span></p>
 </div>
 
+<!-- BOTTOM -->
 <div class="bottom-grid">
 <div>
 <b>Bank Details:</b><br>
@@ -222,7 +244,7 @@ E.& O.E.<br>
 
 <script>
 
-/* ✅ NEW: NUMBER TO WORDS (ONLY ADDITION) */
+/* ✅ NUMBER TO WORDS (ONLY ADDITION) */
 function numberToWords(num) {
 const a = ['', 'One','Two','Three','Four','Five','Six','Seven','Eight','Nine',
 'Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
@@ -232,13 +254,13 @@ const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty',
 function inWords(n){
 if(n<20) return a[n];
 if(n<100) return b[Math.floor(n/10)] + (n%10?' '+a[n%10]:'');
-if(n<1000) return a[Math.floor(n/100)]+' Hundred '+(n%100?inWords(n%100):'');
-if(n<100000) return inWords(Math.floor(n/1000))+' Thousand '+(n%1000?inWords(n%1000):'');
-if(n<10000000) return inWords(Math.floor(n/100000))+' Lakh '+(n%100000?inWords(n%100000):'');
-return inWords(Math.floor(n/10000000))+' Crore '+(n%10000000?inWords(n%10000000):'');
+if(n<1000) return a[Math.floor(n/100)]+' Hundred ' + (n%100?inWords(n%100):'');
+if(n<100000) return inWords(Math.floor(n/1000))+' Thousand ' + (n%1000?inWords(n%1000):'');
+if(n<10000000) return inWords(Math.floor(n/100000))+' Lakh ' + (n%100000?inWords(n%100000):'');
+return inWords(Math.floor(n/10000000))+' Crore ' + (n%10000000?inWords(n%10000000):'');
 }
 
-return inWords(num).trim();
+return inWords(num).replace(/\s+/g,' ').trim();
 }
 
 /* DATE */
@@ -281,7 +303,7 @@ inp.addEventListener("input", calc);
 tbody.appendChild(tr);
 }
 
-/* CALCULATION */
+/* CALCULATION (UNCHANGED except words line) */
 function calc(){
 
 let subtotal=0, cgstVal=0, sgstVal=0, igstVal=0;
@@ -317,7 +339,7 @@ igst.innerText=igstVal.toFixed(2);
 roundoff.innerText=diff.toFixed(2);
 grand.innerText=rounded.toFixed(2);
 
-/* ✅ ONLY CHANGE HERE */
+/* ✅ FIXED */
 words.innerText = numberToWords(rounded) + " Rupees Only";
 
 cgstRow.style.display = posVal==="09"?"block":"none";

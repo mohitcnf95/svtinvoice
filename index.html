@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVT Invoice Creator</title>
+    <title>SVT Invoice System</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
     <style>
         body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
         .editor-container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -18,7 +17,6 @@
         .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
         .btn-dl { background: #1c1e21; color: white; margin-top: 20px; }
         #eway_input_wrap { border: 2px solid #ff4d4d; padding: 10px; border-radius: 8px; background: #fff5f5; }
-
         #pdf-export { display: none; width: 210mm; padding: 12mm; background: white; color: black; box-sizing: border-box; }
         .p-header { text-align: center; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
         .p-info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
@@ -36,30 +34,32 @@
 <body>
 
 <div class="editor-container">
-    <h2>SVT Invoice Creator</h2>
+    <h2 style="text-align:center;">SVT Invoice Creator</h2>
     <div class="field-group"><label>Invoice No:</label><input id="inv_no" value="SVT/26-27/0001"></div>
     <div class="field-group"><label>Date:</label><input id="inv_date"></div>
-    <div class="field-group">
-        <label>State:</label>
-        <select id="inv_state" onchange="calcLive()"><option value="09" selected>Uttar Pradesh (09)</option><option value="07">Delhi (07)</option></select>
+    <div class="field-group"><label>State:</label>
+        <select id="inv_state" onchange="calcLive()">
+            <option value="09" selected>Uttar Pradesh (09)</option>
+            <option value="07">Delhi (07)</option>
+            </select>
     </div>
-    <div class="field-group"><label>Mode:</label><input id="inv_mode"></div>
-    <div class="field-group"><label>Place:</label><input id="inv_place" value="Firozabad"></div>
-    <div class="field-group"><label>Billed To:</label><textarea id="inv_billed"></textarea></div>
+    <div class="field-group"><label>Mode:</label><input id="inv_mode" value="Hand Delivery"></div>
+    <div class="field-group"><label>Place (City):</label><input id="inv_place" value="Firozabad"></div>
+    <div class="field-group"><label>Billed To (First line = Name):</label><textarea id="inv_billed" placeholder="Customer Name&#10;Address Line 1&#10;GSTIN: ..."></textarea></div>
     <div class="field-group"><label>Shipped To:</label><textarea id="inv_shipped"></textarea></div>
     <div class="field-group" id="eway_input_wrap" style="display:none;"><label style="color:red;">E-Way Bill Number:</label><input id="inv_eway"></div>
 
     <div id="item-list"></div>
     <button class="btn" style="background:#e7f3ff; color:#1877f2" onclick="addItem()">+ Add Item</button>
-    <button class="btn btn-dl" onclick="downloadPDF()">Download & Save to Sheet</button>
+    <button class="btn btn-dl" onclick="downloadPDF()">Generate Invoice & Save Record</button>
 </div>
 
 <div id="pdf-export">
     <div class="p-header">
-        <h2>SIDDHI VINAYAK TRADERS</h2>
+        <h2 style="margin:0;">SIDDHI VINAYAK TRADERS</h2>
         <p>12/306, Arya Nagar, Firozabad - 283203</p>
         <p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722 | svtjp11@gmail.com</p>
-        <h3 style="text-decoration: underline; margin-top: 10px; font-size: 18px;">TAX INVOICE</h3>
+        <h3 style="text-decoration: underline; margin-top: 10px; font-size: 18px; text-align: center;">TAX INVOICE</h3>
     </div>
     <table class="p-info-table">
         <tr><td><b>Invoice No:</b></td><td id="p_no"></td><td><b>Mode:</b></td><td id="p_mode"></td></tr>
@@ -79,7 +79,7 @@
         <div id="p_tax_container"></div>
         <p>Round Off: ₹ <span id="p_round">0.00</span></p>
         <div class="p-grand-total">Grand Total: ₹ <span id="p_grand">0.00</span></div>
-        <p><b>Amount in Words:</b> <span id="p_words"></span></p>
+        <p style="margin-top:5px;"><b>Amount in Words:</b> <span id="p_words"></span></p>
     </div>
     <div class="p-bottom-row">
         <div class="p-bottom-box"><b>Bank Details:</b><br>UNION BANK OF INDIA<br>A/C NO.: 424301010040874<br>IFSC: UBIN0542431</div>
@@ -101,15 +101,13 @@
 <script>
     flatpickr("#inv_date", { dateFormat: "d-M-Y", defaultDate: new Date() });
     function addItem() {
-        const div = document.createElement('div');
-        div.className = 'item-card';
+        const div = document.createElement('div'); div.className = 'item-card';
         div.innerHTML = `<textarea placeholder="Item Description" class="i_name" oninput="calcLive()"></textarea>
             <div style="display:flex; gap:5px; margin-top:5px;"><input placeholder="CAS" class="i_cas" style="flex:1"><input placeholder="Pack" class="i_pack" style="flex:1"></div>
             <div style="display:flex; gap:5px; margin-top:5px;"><input type="number" placeholder="Qty" class="i_qty" oninput="calcLive()" style="flex:1"><input type="number" placeholder="Rate" class="i_rate" oninput="calcLive()" style="flex:1"><input type="number" value="18" class="i_gst" oninput="calcLive()" style="flex:0.8"></div>`;
         document.getElementById('item-list').appendChild(div);
     }
     addItem();
-
     function calcLive() {
         let sub = 0, tax = 0;
         document.querySelectorAll('.item-card').forEach(row => {
@@ -118,13 +116,11 @@
         });
         document.getElementById('eway_input_wrap').style.display = (Math.round(sub + tax) > 50000) ? 'block' : 'none';
     }
-
     function indianNumToWords(num) {
         const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
         const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
         const format = (v) => {
-            if (v < 20) return a[v];
-            if (v < 100) return b[Math.floor(v / 10)] + ' ' + a[v % 10];
+            if (v < 20) return a[v]; if (v < 100) return b[Math.floor(v / 10)] + ' ' + a[v % 10];
             if (v < 1000) return a[Math.floor(v / 100)] + ' Hundred ' + format(v % 100);
             if (v < 100000) return format(Math.floor(v / 1000)) + ' Thousand ' + format(v % 1000);
             if (v < 10000000) return format(Math.floor(v / 100000)) + ' Lakh ' + format(v % 100000);
@@ -134,34 +130,40 @@
     }
 
     function downloadPDF() {
-        const scriptURL = 'YOUR_WEB_APP_URL_HERE'; // <--- REPLACE THIS
-        const invNo = document.getElementById('inv_no').value, invDate = document.getElementById('inv_date').value, billedTo = document.getElementById('inv_billed').value, stateVal = document.getElementById('inv_state').value;
-        
-        let sub = 0, taxTotal = 0, productList = [];
-        const pBody = document.getElementById('p_body'); pBody.innerHTML = '';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwHNCeO-DRAIOJTcbOQgTgBm_BarXPgDSxTx5HU1arKxWkdyGHc2AQIlVZozTMyKFc/exec'; 
+        const invNo = document.getElementById('inv_no').value, invDate = document.getElementById('inv_date').value, 
+              fullBilled = document.getElementById('inv_billed').value, place = document.getElementById('inv_place').value, 
+              stateVal = document.getElementById('inv_state').value;
+        const custName = fullBilled.split('\n')[0].trim();
 
+        let sub = 0, taxTotal = 0, pList = [], qList = [], rList = [];
+        const pBody = document.getElementById('p_body'); pBody.innerHTML = '';
         document.querySelectorAll('.item-card').forEach((row, i) => {
             const name = row.querySelector('.i_name').value, q = parseFloat(row.querySelector('.i_qty').value) || 0, r = parseFloat(row.querySelector('.i_rate').value) || 0, g = parseFloat(row.querySelector('.i_gst').value) || 0;
             const lineSub = q * r, lineTax = lineSub * (g / 100);
-            sub += lineSub; taxTotal += lineTax; productList.push(name);
+            sub += lineSub; taxTotal += lineTax; pList.push(name); qList.push(q); rList.push(r);
             pBody.innerHTML += `<tr><td>${i+1}</td><td style="text-align:left;">${name}</td><td>${row.querySelector('.i_cas').value}</td><td>${row.querySelector('.i_pack').value}</td><td>${q}</td><td>${r.toFixed(2)}</td><td>${g}%</td><td>${(lineSub+lineTax).toFixed(2)}</td></tr>`;
         });
-
         const total = sub + taxTotal, rounded = Math.round(total);
-        document.getElementById('p_grand').innerText = rounded.toFixed(2);
-        
-        // Save to Sheet
-        const formData = new FormData();
-        formData.append('InvoiceNo', invNo); formData.append('Date', invDate); formData.append('BilledTo', billedTo);
-        formData.append('Products', productList.join(", ")); formData.append('GrandTotal', rounded);
-        fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.error('Sheet Error', e));
 
-        // PDF Template Sync
+        // SYNC TO GOOGLE SHEET
+        const formData = new FormData();
+        formData.append('InvoiceNo', invNo); 
+        formData.append('CustomerName', custName); 
+        formData.append('Place', place);
+        formData.append('Products', pList.join(", ")); 
+        formData.append('Qty', qList.join(", ")); 
+        formData.append('Rate', rList.join(", "));
+        formData.append('GrandTotal', rounded);
+        
+        fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.error('Sheet Sync Error', e));
+
+        // PDF SYNC
         document.getElementById('p_no').innerText = invNo; document.getElementById('p_date').innerText = invDate;
         document.getElementById('p_state').innerText = document.getElementById('inv_state').options[document.getElementById('inv_state').selectedIndex].text;
         document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
-        document.getElementById('p_place').innerText = document.getElementById('inv_place').value;
-        document.getElementById('p_billed').innerText = billedTo; document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
+        document.getElementById('p_place').innerText = place; document.getElementById('p_billed').innerText = fullBilled;
+        document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
         document.getElementById('p_sub').innerText = sub.toFixed(2);
         document.getElementById('p_tax_container').innerHTML = stateVal === "09" ? `<p>CGST: ₹ ${(taxTotal/2).toFixed(2)}</p><p>SGST: ₹ ${(taxTotal/2).toFixed(2)}</p>` : `<p>IGST: ₹ ${taxTotal.toFixed(2)}</p>`;
         document.getElementById('p_round').innerText = (rounded - total).toFixed(2);

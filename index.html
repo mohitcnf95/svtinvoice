@@ -155,14 +155,12 @@
     </table>
 
     <div class="p-totals">
-        <p>Subtotal: ₹ <span id="p_sub">0.00</span></p>
-        <p>CGST: ₹ <span id="p_cgst">0.00</span></p>
-        <p>SGST: ₹ <span id="p_sgst">0.00</span></p>
-        <p>IGST: ₹ <span id="p_igst">0.00</span></p>
-        <p>Round Off: ₹ <span id="p_round">0.00</span></p>
-        <div class="p-grand-total">Grand Total: ₹ <span id="p_grand">0.00</span></div>
-        <p style="margin-top: 5px;"><b>Amount in Words:</b> <span id="p_words"></span></p>
-    </div>
+    <p>Subtotal: ₹ <span id="p_sub">0.00</span></p>
+    <div id="p_tax_container"></div>
+    <p>Round Off: ₹ <span id="p_round">0.00</span></p>
+    <div class="p-grand-total">Grand Total: ₹ <span id="p_grand">0.00</span></div>
+    <p style="margin-top: 5px;"><b>Amount in Words:</b> <span id="p_words"></span></p>
+</div>
 
     <div class="p-bottom-row">
         <div class="p-bottom-box">
@@ -225,60 +223,75 @@
     }
 
     function downloadPDF() {
-        document.getElementById('p_no').innerText = document.getElementById('inv_no').value;
-        document.getElementById('p_date').innerText = document.getElementById('inv_date').value;
-        document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
-        document.getElementById('p_place').innerText = document.getElementById('inv_place').value;
-        document.getElementById('p_state').innerText = document.getElementById('inv_state').options[document.getElementById('inv_state').selectedIndex].text;
-        document.getElementById('p_billed').innerText = document.getElementById('inv_billed').value;
-        document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
+    const stateSelect = document.getElementById('inv_state');
+    const stateValue = stateSelect.value;
+    
+    document.getElementById('p_no').innerText = document.getElementById('inv_no').value;
+    document.getElementById('p_date').innerText = document.getElementById('inv_date').value;
+    document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
+    document.getElementById('p_place').innerText = document.getElementById('inv_place').value;
+    document.getElementById('p_state').innerText = stateSelect.options[stateSelect.selectedIndex].text;
+    document.getElementById('p_billed').innerText = document.getElementById('inv_billed').value;
+    document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
 
-        const pBody = document.getElementById('p_body');
-        pBody.innerHTML = '';
-        let sub = 0, taxTotal = 0;
-        const state = document.getElementById('inv_state').value;
+    const pBody = document.getElementById('p_body');
+    pBody.innerHTML = '';
+    let sub = 0, taxTotal = 0;
 
-        document.querySelectorAll('.item-card').forEach((row, i) => {
-            const qty = parseFloat(row.querySelector('.i_qty').value) || 0;
-            const rate = parseFloat(row.querySelector('.i_rate').value) || 0;
-            const gst = parseFloat(row.querySelector('.i_gst').value) || 0;
-            const lineSub = qty * rate;
-            const lineTax = lineSub * (gst / 100);
-            sub += lineSub; taxTotal += lineTax;
+    document.querySelectorAll('.item-card').forEach((row, i) => {
+        const qty = parseFloat(row.querySelector('.i_qty').value) || 0;
+        const rate = parseFloat(row.querySelector('.i_rate').value) || 0;
+        const gst = parseFloat(row.querySelector('.i_gst').value) || 0;
+        const lineSub = qty * rate;
+        const lineTax = lineSub * (gst / 100);
+        sub += lineSub; taxTotal += lineTax;
 
-            pBody.innerHTML += `<tr>
-                <td>${i+1}</td>
-                <td style="text-align:left;">${row.querySelector('.i_name').value}</td>
-                <td>${row.querySelector('.i_cas').value}</td>
-                <td>${row.querySelector('.i_pack').value}</td>
-                <td>${qty}</td>
-                <td>${rate.toFixed(2)}</td>
-                <td>${gst}%</td>
-                <td>${(lineSub+lineTax).toFixed(2)}</td>
-            </tr>`;
-        });
+        pBody.innerHTML += `<tr>
+            <td>${i+1}</td>
+            <td style="text-align:left;">${row.querySelector('.i_name').value}</td>
+            <td>${row.querySelector('.i_cas').value}</td>
+            <td>${row.querySelector('.i_pack').value}</td>
+            <td>${qty}</td>
+            <td>${rate.toFixed(2)}</td>
+            <td>${gst}%</td>
+            <td>${(lineSub+lineTax).toFixed(2)}</td>
+        </tr>`;
+    });
 
-        const rounded = Math.round(sub + taxTotal);
-        document.getElementById('p_sub').innerText = sub.toFixed(2);
-        
-        if (state === "09") {
-            document.getElementById('p_cgst').innerText = (taxTotal / 2).toFixed(2);
-            document.getElementById('p_sgst').innerText = (taxTotal / 2).toFixed(2);
-            document.getElementById('p_igst').innerText = "0.00";
-        } else {
-            document.getElementById('p_cgst').innerText = "0.00";
-            document.getElementById('p_sgst').innerText = "0.00";
-            document.getElementById('p_igst').innerText = taxTotal.toFixed(2);
-        }
+    const rounded = Math.round(sub + taxTotal);
+    document.getElementById('p_sub').innerText = sub.toFixed(2);
+    
+    // MODIFIED TAX LOGIC
+    const taxContainer = document.getElementById('p_tax_container');
+    taxContainer.innerHTML = ''; // Clear previous
 
-        document.getElementById('p_round').innerText = (rounded - (sub + taxTotal)).toFixed(2);
-        document.getElementById('p_grand').innerText = rounded.toFixed(2);
-        document.getElementById('p_words').innerText = indianNumToWords(rounded);
-
-        const element = document.getElementById('pdf-export');
-        element.style.display = 'block';
-        html2pdf().from(element).set({ margin: 0, filename: 'Invoice.pdf', html2canvas: { scale: 3 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save().then(() => { element.style.display = 'none'; });
+    if (stateValue === "09") {
+        // Show only CGST and SGST for Uttar Pradesh
+        taxContainer.innerHTML = `
+            <p>CGST: ₹ ${(taxTotal / 2).toFixed(2)}</p>
+            <p>SGST: ₹ ${(taxTotal / 2).toFixed(2)}</p>
+        `;
+    } else {
+        // Show only IGST for all other states
+        taxContainer.innerHTML = `<p>IGST: ₹ ${taxTotal.toFixed(2)}</p>`;
     }
+
+    document.getElementById('p_round').innerText = (rounded - (sub + taxTotal)).toFixed(2);
+    document.getElementById('p_grand').innerText = rounded.toFixed(2);
+    document.getElementById('p_words').innerText = indianNumToWords(rounded);
+
+    const element = document.getElementById('pdf-export');
+    element.style.display = 'block';
+    
+    html2pdf().from(element).set({ 
+        margin: 0, 
+        filename: 'Invoice.pdf', 
+        html2canvas: { scale: 3 }, 
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+    }).save().then(() => { 
+        element.style.display = 'none'; 
+    });
+}
 </script>
 </body>
 </html>

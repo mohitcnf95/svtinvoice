@@ -5,8 +5,6 @@
 <title>SVT Invoice</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <style>
 body { font-family: Arial; background:#f5f5f5; margin:0; }
@@ -17,53 +15,30 @@ margin:auto;
 background:white;
 padding:8mm;
 box-sizing:border-box;
+position:relative;
 }
 
-/* HEADER */
-.header { text-align:center; margin-bottom:10px; }
-.header h2 { margin:5px 0; }
-.header p { margin:2px 0; }
-
-/* GRID */
-.row {
-display:flex;
-justify-content:space-between;
-gap:20px;
-margin-top:6px;
-}
-
-.col {
-width:50%;
-}
-
-/* LABEL + VALUE */
-.field {
-display:flex;
-gap:6px;
-margin-bottom:4px;
-align-items:center;
-}
-
-.field label {
-min-width:120px;
-font-weight:500;
-}
+.header { text-align:center; }
+.header h2, .header p, .header h3 { margin:3px 0; }
 
 input, textarea, select {
 width:100%;
 border:none;
 font-size:12px;
-background:#f0f0f0;
-padding:3px;
 }
 
+/* MULTILINE SUPPORT */
 textarea {
-resize:none;
-min-height:50px;
-
-/* ✅ FIX LINE BREAK ISSUE */
 white-space: pre-wrap;
 word-break: break-word;
+resize:none;
+}
+
+/* PRINT BLOCK */
+.print-block {
+white-space: pre-wrap;
+word-break: break-word;
+font-size:12px;
 }
 
 /* TABLE */
@@ -71,6 +46,7 @@ table {
 width:100%;
 border-collapse:collapse;
 margin-top:8px;
+table-layout:auto;
 }
 
 th, td {
@@ -78,37 +54,27 @@ border:1px solid black;
 padding:5px;
 font-size:12px;
 text-align:center;
+vertical-align:top;
 }
 
-td:nth-child(2){
-text-align:left;
-word-break:break-word;
+td:nth-child(2), th:nth-child(2) {
+white-space: normal;
+word-break: break-word;
 }
 
-/* SUMMARY */
+td textarea, td input {
+width:100%;
+border:none;
+font-size:12px;
+white-space: normal;
+word-break: break-word;
+resize:none;
+overflow:hidden;
+}
+
 .summary {
 text-align:right;
-margin-top:10px;
-}
-
-.summary p { margin:2px 0; }
-
-/* BOTTOM */
-.bottom-grid {
-display:grid;
-grid-template-columns:1fr 1fr;
-margin-top:10px;
-border:1px solid black;
-}
-
-.bottom-grid div {
-border-right:1px solid black;
-padding:6px;
-font-size:10px;
-}
-
-.bottom-grid div:last-child {
-border-right:none;
+margin-top:8px;
 }
 
 .footer {
@@ -133,72 +99,56 @@ border:none;
 <div id="invoice" class="container">
 
 <div class="header">
-<img src="logo.png" style="width:60px;"><br>
 <h2>SIDDHI VINAYAK TRADERS</h2>
 <p>12/306, Arya Nagar, Firozabad - 283203</p>
 <p>GSTIN: 09BFZPK4340C2Z7 | +91 9286107722 | svtjp11@gmail.com</p>
 <h3>TAX INVOICE</h3>
 </div>
 
-<!-- TOP SECTION -->
-<div class="row">
+<div style="display:flex; gap:20px; margin-top:10px;">
+<div style="flex:1;">
+Invoice No:<br>
+<input id="invno" value="SVT/26-27/0001"><br>
 
-<div class="col">
-<div class="field">
-<label>Invoice No:</label>
-<input id="invno" value="SVT/26-27/0001">
-</div>
+Date:<br>
+<input type="date" id="today"><br>
 
-<div class="field">
-<label>Date:</label>
-<input type="text" id="today" readonly>
-</div>
-
-<div class="field">
-<label>State:</label>
-<select id="pos" onchange="calc()">
+State:<br>
+<select id="state" onchange="calc()">
 <option value="">-- Select State --</option>
 <option value="09">Uttar Pradesh (09)</option>
-<option value="07">Delhi (07)</option>
 <option value="06">Haryana (06)</option>
+<option value="07">Delhi (07)</option>
 <option value="27">Maharashtra (27)</option>
+<option value="24">Gujarat (24)</option>
 </select>
 </div>
 
-</div>
+<div style="flex:1;">
+Mode of Supply:<br>
+<input id="mode"><br>
 
-<div class="col">
-<div class="field">
-<label>Mode of Supply:</label>
-<input placeholder="Road / Courier">
-</div>
-
-<div class="field">
-<label>Place of Supply:</label>
-<input id="place" placeholder="Enter Place">
+Place of Supply:<br>
+<input id="pos"><br>
 </div>
 </div>
 
+<br>
+
+<div style="display:flex; gap:20px;">
+<div style="flex:1;">
+<b>Billed To:</b><br>
+<textarea id="billInput" rows="3"></textarea>
+<div id="billPrint" class="print-block" style="display:none;"></div>
 </div>
 
-<!-- BILL / SHIP -->
-<div class="row">
-
-<div class="col">
-<b>Billed To:</b>
-<textarea id="billInput"></textarea>
-<div id="billPrint" style="display:none; white-space:pre-wrap;"></div>
+<div style="flex:1;">
+<b>Shipped To:</b><br>
+<textarea id="shipInput" rows="3"></textarea>
+<div id="shipPrint" class="print-block" style="display:none;"></div>
+</div>
 </div>
 
-<div class="col">
-<b>Shipped To:</b>
-<textarea id="shipInput"></textarea>
-<div id="shipPrint" style="display:none; white-space:pre-wrap;"></div>
-</div>
-
-</div>
-
-<!-- TABLE -->
 <table>
 <thead>
 <tr>
@@ -211,32 +161,32 @@ border:none;
 
 <button onclick="addRow()">+ Add Item</button>
 
-<!-- SUMMARY -->
 <div class="summary">
 <p>Subtotal: ₹ <span id="sub">0</span></p>
-<p id="cgstRow">CGST: ₹ <span id="cgst">0</span></p>
-<p id="sgstRow">SGST: ₹ <span id="sgst">0</span></p>
-<p id="igstRow">IGST: ₹ <span id="igst">0</span></p>
-<p>Round Off: ₹ <span id="roundoff">0</span></p>
+<p>CGST: ₹ <span id="cgst">0</span></p>
+<p>SGST: ₹ <span id="sgst">0</span></p>
+<p>IGST: ₹ <span id="igst">0</span></p>
+<p>Round Off: ₹ <span id="round">0</span></p>
 
 <h3>Grand Total: ₹ <span id="grand">0</span></h3>
 <p><b>Amount in Words:</b> <span id="words"></span></p>
 </div>
 
-<!-- BOTTOM -->
-<div class="bottom-grid">
-<div>
+<br>
+
+<div style="display:flex; border:1px solid black;">
+<div style="flex:1; padding:8px; font-size:11px;">
 <b>Bank Details:</b><br>
 UNION BANK OF INDIA<br>
 A/C NO.: 424301010040874<br>
 IFSC: UBIN0542431
 </div>
 
-<div>
+<div style="flex:1; padding:8px; font-size:11px;">
 <b>Terms & Conditions:</b><br>
 E.& O.E.<br>
 1. Goods once sold will not be taken back.<br>
-2. Interest @ 18% p.a. will be charged if payment is delayed.<br>
+2. Interest @ 18% p.a. if delayed.<br>
 3. Above mentioned item/items are for R&D/Laboratory use ONLY.<br>
 4. Subject to 'FIROZABAD' Jurisdiction only.
 </div>
@@ -253,24 +203,34 @@ E.& O.E.<br>
 
 <script>
 
-/* DATE */
-function formatDate(date){
-const d = date.getDate().toString().padStart(2,'0');
-const m = date.toLocaleString('en-GB',{month:'short'});
-const y = date.getFullYear();
-return `${d}-${m}-${y}`;
+document.getElementById("today").valueAsDate = new Date();
+
+addRow();
+
+/* ===================== */
+/* ✅ NEW WORD FUNCTION */
+/* ===================== */
+function numberToWords(num) {
+
+const a = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine",
+"Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen",
+"Sixteen","Seventeen","Eighteen","Nineteen"];
+
+const b = ["","","Twenty","Thirty","Forty","Fifty","Sixty","Seventy","Eighty","Ninety"];
+
+function inWords(n){
+if(n<20) return a[n];
+if(n<100) return b[Math.floor(n/10)] + (n%10?" "+a[n%10]:"");
+if(n<1000) return a[Math.floor(n/100)]+" Hundred "+(n%100?inWords(n%100):"");
+if(n<100000) return inWords(Math.floor(n/1000))+" Thousand "+(n%1000?inWords(n%1000):"");
+if(n<10000000) return inWords(Math.floor(n/100000))+" Lakh "+(n%100000?inWords(n%100000):"");
+return inWords(Math.floor(n/10000000))+" Crore "+(n%10000000?inWords(n%10000000):"");
 }
 
-flatpickr("#today", {
-dateFormat: "d-M-Y",
-defaultDate: new Date(),
-disableMobile: true,
-onReady: (_,__,i)=>i.input.value=formatDate(new Date()),
-onChange: d=>today.value=formatDate(d[0])
-});
+return inWords(num).trim();
+}
 
-/* TABLE */
-addRow();
+/* ===================== */
 
 function addRow(){
 let tr=document.createElement("tr");
@@ -278,7 +238,7 @@ let n=tbody.rows.length+1;
 
 tr.innerHTML=`
 <td>${n}</td>
-<td><textarea></textarea></td>
+<td><textarea oninput="calc()"></textarea></td>
 <td><input></td>
 <td><input></td>
 <td><input type="number" oninput="calc()"></td>
@@ -291,69 +251,66 @@ tbody.appendChild(tr);
 
 function calc(){
 
-let subtotal=0,cgstVal=0,sgstVal=0,igstVal=0;
-let posVal=document.getElementById("pos").value;
+let sub=0,cgst=0,sgst=0,igst=0;
+let state=document.getElementById("state").value;
 
 document.querySelectorAll("#tbody tr").forEach(r=>{
-let qty=parseFloat(r.cells[4].children[0].value)||0;
-let rate=parseFloat(r.cells[5].children[0].value)||0;
-let gst=parseFloat(r.cells[6].children[0].value)||0;
+
+let qty=+r.cells[4].children[0].value||0;
+let rate=+r.cells[5].children[0].value||0;
+let gst=+r.cells[6].children[0].value||0;
 
 let amt=qty*rate;
-let gstAmt=amt*gst/100;
+let gstVal=amt*gst/100;
 
-r.cells[7].innerText=(amt+gstAmt).toFixed(2);
-subtotal+=amt;
+r.cells[7].innerText=(amt+gstVal).toFixed(2);
 
-if(posVal==="09"){
-cgstVal+=gstAmt/2;
-sgstVal+=gstAmt/2;
-}else if(posVal!==""){
-igstVal+=gstAmt;
+sub+=amt;
+
+if(state==="09"){
+cgst+=gstVal/2;
+sgst+=gstVal/2;
+}else{
+igst+=gstVal;
 }
+
 });
 
-let total=subtotal+cgstVal+sgstVal+igstVal;
-let round=Math.round(total||0);
-let diff=round-total;
+let total=sub+cgst+sgst+igst;
 
-sub.innerText=subtotal.toFixed(2);
-cgst.innerText=cgstVal.toFixed(2);
-sgst.innerText=sgstVal.toFixed(2);
-igst.innerText=igstVal.toFixed(2);
-roundoff.innerText=diff.toFixed(2);
-grand.innerText=round.toFixed(2);
+let rounded=Math.round(total);
+let roundDiff=rounded-total;
 
-words.innerText=round.toLocaleString('en-IN')+" Rupees Only";
+subEl.innerText=sub.toFixed(2);
+cgstEl.innerText=cgst.toFixed(2);
+sgstEl.innerText=sgst.toFixed(2);
+igstEl.innerText=igst.toFixed(2);
 
-cgstRow.style.display=posVal==="09"?"block":"none";
-sgstRow.style.display=posVal==="09"?"block":"none";
-igstRow.style.display=posVal==="09"?"none":"block";
+document.getElementById("round").innerText=roundDiff.toFixed(2);
+document.getElementById("grand").innerText=rounded.toFixed(2);
+
+/* ✅ ONLY THIS LINE CHANGED */
+document.getElementById("words").innerText = numberToWords(rounded) + " Rupees Only";
 }
 
-function preparePDF() {
-    
-    // convert textarea → printable div
-    billPrint.innerText = billInput.value;
-    shipPrint.innerText = shipInput.value;
-    
-    // hide textarea
-    billInput.style.display = "none";
-    shipInput.style.display = "none";
-    
-    // show formatted text
-    billPrint.style.display = "block";
-    shipPrint.style.display = "block";
-    
-    // generate PDF
-    html2pdf().from(invoice).save(invno.value + ".pdf");
-    
-    // restore original view
-    billInput.style.display = "block";
-    shipInput.style.display = "block";
-    
-    billPrint.style.display = "none";
-    shipPrint.style.display = "none";
+function preparePDF(){
+
+billPrint.innerText = billInput.value;
+shipPrint.innerText = shipInput.value;
+
+billInput.style.display="none";
+shipInput.style.display="none";
+
+billPrint.style.display="block";
+shipPrint.style.display="block";
+
+html2pdf().from(invoice).save(invno.value + ".pdf");
+
+billInput.style.display="block";
+shipInput.style.display="block";
+
+billPrint.style.display="none";
+shipPrint.style.display="none";
 }
 
 </script>

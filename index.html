@@ -10,25 +10,24 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
-        body { font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 10px; }
-        .container { max-width: 850px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        /* CLEAN EDITOR UI */
+        body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 15px; }
+        .editor-container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-top: 0; }
         
-        /* Editor UI Styles */
-        .input-row { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; }
-        .input-group { flex: 1; min-width: 200px; }
-        label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; }
-        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        textarea { height: 60px; }
+        .field-group { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        textarea { height: 70px; }
 
-        .table-wrap { overflow-x: auto; margin: 15px 0; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 13px; }
+        table.editor-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .editor-table th, .editor-table td { border: 1px solid #ddd; padding: 8px; font-size: 12px; }
+        
+        .btn { padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-add { background: #28a745; color: white; }
+        .btn-dl { background: #000; color: white; font-size: 16px; margin-top: 25px; }
 
-        .btn { padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        .btn-add { background: #28a745; color: white; width: 100%; }
-        .btn-dl { background: #000; color: white; width: 100%; margin-top: 20px; font-size: 16px; padding: 15px; }
-
-        /* PDF OUTPUT STYLING */
+        /* PROFESSIONAL PDF TEMPLATE (Hidden) */
         #pdf-export { 
             display: none; 
             width: 210mm; 
@@ -36,120 +35,113 @@
             background: white; 
             color: black; 
             box-sizing: border-box;
+            position: relative;
         }
         .pdf-header { text-align: center; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 15px; }
-        .pdf-header h2 { margin: 0; text-transform: uppercase; font-size: 22px; }
+        .pdf-header h2 { margin: 0; font-size: 22px; }
         .pdf-header p { margin: 2px 0; font-size: 12px; }
         
         .pdf-info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-        .pdf-info-table td { border: 1px solid #000; padding: 4px; font-size: 11px; width: 25%; }
+        .pdf-info-table td { border: 1px solid #000; padding: 4px; font-size: 11px; }
 
         .pdf-address-row { display: flex; gap: 15px; margin-bottom: 10px; }
-        .pdf-address-box { flex: 1; border: 1px solid #000; padding: 6px; min-height: 70px; font-size: 11px; }
+        .pdf-address-box { flex: 1; border: 1px solid #000; padding: 6px; min-height: 80px; font-size: 11px; }
 
         .pdf-item-table { width: 100%; border-collapse: collapse; }
         .pdf-item-table th, .pdf-item-table td { border: 1px solid #000; padding: 5px; font-size: 11px; text-align: center; }
         .pdf-item-table th { background: #f2f2f2; }
 
-        /* Aligned Totals & Info Section */
-        .pdf-totals-section { text-align: right; margin-top: 10px; font-size: 12px; }
-        .pdf-totals-section p { margin: 2px 0; }
-        .grand-total-row { font-size: 14px; font-weight: bold; border-top: 1px solid #000; display: inline-block; padding-top: 4px; min-width: 200px; }
+        .pdf-totals { text-align: right; margin-top: 10px; font-size: 12px; }
+        .pdf-totals p { margin: 2px 0; }
+        .grand-total { font-size: 14px; font-weight: bold; border-top: 1px solid #000; padding-top: 5px; display: inline-block; min-width: 180px; }
 
-        /* Terms and Bank in same line */
-        .pdf-bottom-grid { display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid #000; padding-top: 10px; }
-        .pdf-terms { width: 55%; font-size: 10px; line-height: 1.3; }
-        .pdf-bank { width: 40%; font-size: 10px; text-align: left; }
+        /* Side-by-side Terms and Bank */
+        .pdf-bottom-flex { display: flex; justify-content: space-between; margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; }
+        .pdf-terms { width: 58%; font-size: 10px; line-height: 1.4; }
+        .pdf-bank { width: 38%; font-size: 10px; }
 
-        .pdf-footer { display: flex; justify-content: space-between; margin-top: 40px; font-size: 12px; }
+        .pdf-footer { display: flex; justify-content: space-between; margin-top: 50px; font-size: 12px; }
     </style>
 </head>
 <body>
 
-<div class="container" id="editor-ui">
-    <h2 style="text-align: center; margin-top: 0;">SVT Invoice Creator</h2>
+<div class="editor-container">
+    <h2>SVT Invoice Creator</h2>
     
-    <div class="input-row">
-        [span_2](start_span)[span_3](start_span)<div class="input-group"><label>Invoice No:</label><input id="inv_no" value="SVT/26-27/0002">[span_2](end_span)[span_3](end_span)</div>
-        [span_4](start_span)[span_5](start_span)<div class="input-group"><label>Date:</label><input id="inv_date">[span_4](end_span)[span_5](end_span)</div>
-        <div class="input-group">
-            <label>State:</label>
-            [span_6](start_span)[span_7](start_span)<select id="inv_state"><option value="09">Uttar Pradesh (09)</option><option value="07">Delhi (07)</option></select>[span_6](end_span)[span_7](end_span)
-        </div>
+    <div class="field-group"><label>Invoice No:</label><input id="inv_no" value="SVT/26-27/0002"></div>
+    <div class="field-group"><label>Date:</label><input id="inv_date"></div>
+    <div class="field-group">
+        <label>State:</label>
+        <select id="inv_state"><option value="09">Uttar Pradesh (09)</option><option value="07">Delhi (07)</option></select>
     </div>
+    <div class="field-group"><label>Mode of Transport:</label><input id="inv_mode" value="Hand Delivery"></div>
+    <div class="field-group"><label>Place of Supply:</label><input id="inv_place" value="Firozabad"></div>
+    <div class="field-group"><label>Billed To:</label><textarea id="inv_billed"></textarea></div>
+    <div class="field-group"><label>Shipped To:</label><textarea id="inv_shipped"></textarea></div>
 
-    <div class="input-row">
-        [span_8](start_span)[span_9](start_span)<div class="input-group"><label>Mode of Transport:</label><input id="inv_mode" value="Hand Delivery">[span_8](end_span)[span_9](end_span)</div>
-        [span_10](start_span)[span_11](start_span)<div class="input-group"><label>Place of Supply:</label><input id="inv_place" value="Firozabad">[span_10](end_span)[span_11](end_span)</div>
-    </div>
-
-    <div class="input-row">
-        [span_12](start_span)[span_13](start_span)<div class="input-group"><label>Billed To:</label><textarea id="inv_billed"></textarea>[span_12](end_span)[span_13](end_span)</div>
-        [span_14](start_span)[span_15](start_span)<div class="input-group"><label>Shipped To:</label><textarea id="inv_shipped"></textarea>[span_14](end_span)[span_15](end_span)</div>
-    </div>
-
-    <div class="table-wrap">
-        <table>
-            [span_16](start_span)[span_17](start_span)<thead><tr><th>Item Description</th><th>CAS</th><th>Pack</th><th>Qty</th><th>Rate</th><th>GST%</th></tr></thead>[span_16](end_span)[span_17](end_span)
+    <div style="overflow-x:auto;">
+        <table class="editor-table">
+            <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>GST%</th></tr></thead>
             <tbody id="editor-body"></tbody>
         </table>
     </div>
-    [span_18](start_span)[span_19](start_span)<button class="btn btn-add" onclick="addRow()">+ Add Item</button>[span_18](end_span)[span_19](end_span)
+    
+    <button class="btn btn-add" onclick="addRow()">+ Add Item Row</button>
     <button class="btn btn-dl" onclick="downloadPDF()">Download Professional PDF</button>
 </div>
 
 <div id="pdf-export">
     <div class="pdf-header">
-        [span_20](start_span)[span_21](start_span)<h2>SIDDHI VINAYAK TRADERS</h2>[span_20](end_span)[span_21](end_span)
-        [span_22](start_span)[span_23](start_span)<p>12/306, Arya Nagar, Firozabad - 283203</p>[span_22](end_span)[span_23](end_span)
-        <p>GSTIN: 09BFZPK4340C2Z7 | [span_24](start_span)[span_25](start_span)+91 9286107722 | svtjp11@gmail.com</p>[span_24](end_span)[span_25](end_span)
-        [span_26](start_span)[span_27](start_span)<h3 style="text-decoration: underline; margin-top: 8px; font-size: 16px;">TAX INVOICE</h3>[span_26](end_span)[span_27](end_span)
+        <h2>SIDDHI VINAYAK TRADERS</h2>
+        [span_0](start_span)<p>12/306, Arya Nagar, Firozabad - 283203[span_0](end_span)</p>
+        <p>GSTIN: 09BFZPK4340C2Z7 | [span_1](start_span)+91 9286107722 | svtjp11@gmail.com[span_1](end_span)</p>
+        <h3 style="text-decoration: underline; margin-top: 10px; text-align:center;">TAX INVOICE</h3>
     </div>
 
     <table class="pdf-info-table">
-        [span_28](start_span)[span_29](start_span)[span_30](start_span)<tr><td><b>Invoice No:</b></td><td id="p_no"></td><td><b>Mode:</b></td><td id="p_mode"></td></tr>[span_28](end_span)[span_29](end_span)[span_30](end_span)
-        [span_31](start_span)[span_32](start_span)[span_33](start_span)<tr><td><b>Date:</b></td><td id="p_date"></td><td><b>Place:</b></td><td id="p_place"></td></tr>[span_31](end_span)[span_32](end_span)[span_33](end_span)
-        [span_34](start_span)[span_35](start_span)<tr><td><b>State:</b></td><td id="p_state" colspan="3"></td></tr>[span_34](end_span)[span_35](end_span)
+        <tr><td><b>Invoice No:</b></td><td id="p_no"></td><td><b>Mode:</b></td><td id="p_mode"></td></tr>
+        <tr><td><b>Date:</b></td><td id="p_date"></td><td><b>Place:</b></td><td id="p_place"></td></tr>
+        <tr><td><b>State:</b></td><td id="p_state" colspan="3"></td></tr>
     </table>
 
     <div class="pdf-address-row">
-        [span_36](start_span)[span_37](start_span)<div class="pdf-address-box"><b>Billed To:</b><br><span id="p_billed" style="white-space: pre-wrap;"></span></div>[span_36](end_span)[span_37](end_span)
-        [span_38](start_span)[span_39](start_span)<div class="pdf-address-box"><b>Shipped To:</b><br><span id="p_shipped" style="white-space: pre-wrap;"></span></div>[span_38](end_span)[span_39](end_span)
+        <div class="pdf-address-box"><b>Billed To:</b><br><span id="p_billed" style="white-space: pre-wrap;"></span></div>
+        <div class="pdf-address-box"><b>Shipped To:</b><br><span id="p_shipped" style="white-space: pre-wrap;"></span></div>
     </div>
 
     <table class="pdf-item-table">
-        [span_40](start_span)[span_41](start_span)<thead><tr><th>S.N</th><th>Item Description</th><th>CAS</th><th>Pack</th><th>Qty</th><th>Rate</th><th>GST%</th><th>Total</th></tr></thead>[span_40](end_span)[span_41](end_span)
+        <thead><tr><th>S.N</th><th>Item Description</th><th>Qty</th><th>Rate</th><th>GST%</th><th>Total</th></tr></thead>
         <tbody id="p_body"></tbody>
     </table>
 
-    <div class="pdf-totals-section">
-        [span_42](start_span)<p>Subtotal: ₹ <span id="p_sub">0.00</span></p>[span_42](end_span)
-        [span_43](start_span)<p>CGST + SGST: ₹ <span id="p_tax">0.00</span></p>[span_43](end_span)
-        [span_44](start_span)<p>Round Off: ₹ <span id="p_round">0.00</span></p>[span_44](end_span)
-        [span_45](start_span)<div class="grand-total-row">Grand Total: ₹ <span id="p_grand">0.00</span></div>[span_45](end_span)
+    <div class="pdf-totals">
+        <p>Subtotal: ₹ <span id="p_sub">0.00</span></p>
+        <p>CGST + SGST: ₹ <span id="p_tax">0.00</span></p>
+        <p>Round Off: ₹ <span id="p_round">0.00</span></p>
+        <div class="grand-total">Grand Total: ₹ <span id="p_grand">0.00</span></div>
     </div>
 
-    [span_46](start_span)<p style="font-size: 11px; margin-top: 5px;"><b>Amount in Words:</b> <span id="p_words"></span></p>[span_46](end_span)
+    <p style="font-size: 11px; margin-top: 5px;"><b>Amount in Words:</b> <span id="p_words"></span></p>
 
-    <div class="pdf-bottom-grid">
+    <div class="pdf-bottom-flex">
         <div class="pdf-terms">
-            [span_47](start_span)[span_48](start_span)<b>Terms & Conditions:</b><br>[span_47](end_span)[span_48](end_span)
-            1. [span_49](start_span)[span_50](start_span)Goods once sold will not be taken back.<br>[span_49](end_span)[span_50](end_span)
-            2. [span_51](start_span)[span_52](start_span)Interest @ 18% p.a. will be charged if payment is delayed.<br>[span_51](end_span)[span_52](end_span)
-            3. [span_53](start_span)[span_54](start_span)Items are for R&D/Laboratory use ONLY.<br>[span_53](end_span)[span_54](end_span)
-            4. [span_55](start_span)[span_56](start_span)Subject to 'FIROZABAD' Jurisdiction only.[span_55](end_span)[span_56](end_span)
+            <b>Terms & Conditions:</b><br>
+            1. [span_2](start_span)Goods once sold will not be taken back.[span_2](end_span)<br>
+            2. [span_3](start_span)Interest @ 18% p.a. will be charged if payment is delayed.[span_3](end_span)<br>
+            3. [span_4](start_span)Items are for R&D/Laboratory use ONLY.[span_4](end_span)<br>
+            4. [span_5](start_span)Subject to 'FIROZABAD' Jurisdiction only.[span_5](end_span)
         </div>
         <div class="pdf-bank">
-            [span_57](start_span)[span_58](start_span)<b>Bank Details:</b><br>[span_57](end_span)[span_58](end_span)
-            [span_59](start_span)[span_60](start_span)UNION BANK OF INDIA<br>[span_59](end_span)[span_60](end_span)
-            [span_61](start_span)[span_62](start_span)A/C: 424301010040874<br>[span_61](end_span)[span_62](end_span)
-            [span_63](start_span)[span_64](start_span)IFSC: UBIN0542431[span_63](end_span)[span_64](end_span)
+            <b>Bank Details:</b><br>
+            [span_6](start_span)UNION BANK OF INDIA[span_6](end_span)<br>
+            [span_7](start_span)A/C NO.: 424301010040874[span_7](end_span)<br>
+            [span_8](start_span)IFSC: UBIN0542431[span_8](end_span)
         </div>
     </div>
 
     <div class="pdf-footer">
-        [span_65](start_span)[span_66](start_span)<div>Receiver's Signature<br><br>________________</div>[span_65](end_span)[span_66](end_span)
-        [span_67](start_span)[span_68](start_span)<div style="text-align: right;">For <b>Siddhi Vinayak Traders</b><br><br>Authorised Signatory</div>[span_67](end_span)[span_68](end_span)
+        <div>Receiver's Signature<br><br>________________</div>
+        <div style="text-align: right;">For <b>Siddhi Vinayak Traders</b><br><br>Authorised Signatory</div>
     </div>
 </div>
 
@@ -159,8 +151,9 @@
     function addRow() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td><input class="i_name"></td><td><input class="i_cas"></td><td><input class="i_pack"></td>
-            <td><input type="number" class="i_qty" value="0"></td><td><input type="number" class="i_rate" value="0"></td>
+            <td><input class="i_name" placeholder="Item Name"></td>
+            <td><input type="number" class="i_qty" value="0"></td>
+            <td><input type="number" class="i_rate" value="0"></td>
             <td><input type="number" class="i_gst" value="18"></td>
         `;
         document.getElementById('editor-body').appendChild(tr);
@@ -170,7 +163,6 @@
     function indianNumberToWords(num) {
         const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
         const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-
         function format(n) {
             if (n < 20) return a[n];
             if (n < 100) return b[Math.floor(n / 10)] + ' ' + a[n % 10];
@@ -179,11 +171,11 @@
             if (n < 10000000) return format(Math.floor(n / 100000)) + ' Lakh ' + format(n % 100000);
             return format(Math.floor(n / 10000000)) + ' Crore ' + format(n % 10000000);
         }
-        return (format(num) + "Rupees Only").replace(/\s+/g, ' ');
+        return num > 0 ? (format(num) + "Rupees Only").replace(/\s+/g, ' ') : "Zero Rupees Only";
     }
 
     function downloadPDF() {
-        [span_69](start_span)// Data Mapping[span_69](end_span)
+        // Transfer Editor data to PDF template
         document.getElementById('p_no').innerText = document.getElementById('inv_no').value;
         document.getElementById('p_date').innerText = document.getElementById('inv_date').value;
         document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
@@ -197,6 +189,7 @@
         let sub = 0, tax = 0;
 
         document.querySelectorAll('#editor-body tr').forEach((row, i) => {
+            const name = row.querySelector('.i_name').value;
             const qty = parseFloat(row.querySelector('.i_qty').value) || 0;
             const rate = parseFloat(row.querySelector('.i_rate').value) || 0;
             const gst = parseFloat(row.querySelector('.i_gst').value) || 0;
@@ -204,7 +197,7 @@
             const lineTax = lineSub * (gst / 100);
             sub += lineSub; tax += lineTax;
 
-            pBody.innerHTML += `<tr><td>${i+1}</td><td>${row.querySelector('.i_name').value}</td><td>${row.querySelector('.i_cas').value}</td><td>${row.querySelector('.i_pack').value}</td><td>${qty}</td><td>${rate}</td><td>${gst}%</td><td>${(lineSub+lineTax).toFixed(2)}</td></tr>`;
+            pBody.innerHTML += `<tr><td>${i+1}</td><td style="text-align:left;">${name}</td><td>${qty}</td><td>${rate.toFixed(2)}</td><td>${gst}%</td><td>${(lineSub+lineTax).toFixed(2)}</td></tr>`;
         });
 
         const total = sub + tax;
@@ -218,12 +211,16 @@
         const element = document.getElementById('pdf-export');
         element.style.display = 'block';
 
-        html2pdf().from(element).set({
+        const opt = {
             margin: 0,
             filename: document.getElementById('inv_no').value + '.pdf',
             html2canvas: { scale: 3 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).save().then(() => { element.style.display = 'none'; });
+        };
+
+        html2pdf().from(element).set(opt).save().then(() => {
+            element.style.display = 'none';
+        });
     }
 </script>
 </body>

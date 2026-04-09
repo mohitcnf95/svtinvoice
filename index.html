@@ -143,14 +143,17 @@
         document.getElementById('item-list').appendChild(div);
     }
     addItem();
+
     function calcLive() {
         let sub = 0, tax = 0;
         document.querySelectorAll('.item-card').forEach(row => {
             const q = parseFloat(row.querySelector('.i_qty').value) || 0, r = parseFloat(row.querySelector('.i_rate').value) || 0, g = parseFloat(row.querySelector('.i_gst').value) || 0;
             sub += (q * r); tax += (q * r * g / 100);
         });
-        document.getElementById('eway_input_wrap').style.display = (Math.round(sub + tax) > 50000) ? 'block' : 'none';
+        const total = Math.round(sub + tax);
+        document.getElementById('eway_input_wrap').style.display = total > 50000 ? 'block' : 'none';
     }
+
     function indianNumToWords(num) {
         const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
         const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
@@ -173,13 +176,32 @@
 
         let sub = 0, taxTotal = 0, pList = [], qList = [], rList = [];
         const pBody = document.getElementById('p_body'); pBody.innerHTML = '';
+
         document.querySelectorAll('.item-card').forEach((row, i) => {
             const name = row.querySelector('.i_name').value, q = parseFloat(row.querySelector('.i_qty').value) || 0, r = parseFloat(row.querySelector('.i_rate').value) || 0, g = parseFloat(row.querySelector('.i_gst').value) || 0;
             const lineSub = q * r, lineTax = lineSub * (g / 100);
-            sub += lineSub; taxTotal += lineTax; pList.push(name); qList.push(q); rList.push(r);
+            sub += lineSub; taxTotal += lineTax; 
+            if(name) { pList.push(name); qList.push(q); rList.push(r); }
             pBody.innerHTML += `<tr><td>${i+1}</td><td style="text-align:left;">${name}</td><td>${row.querySelector('.i_cas').value}</td><td>${row.querySelector('.i_pack').value}</td><td>${q}</td><td>${r.toFixed(2)}</td><td>${g}%</td><td>${(lineSub+lineTax).toFixed(2)}</td></tr>`;
         });
-        const total = sub + taxTotal, rounded = Math.round(total);
+
+        const total = sub + taxTotal;
+        const rounded = Math.round(total);
+
+        // SYNC VALUES TO PDF TEMPLATE BEFORE EXPORT
+        document.getElementById('p_no').innerText = invNo;
+        document.getElementById('p_date').innerText = invDate;
+        document.getElementById('p_state').innerText = document.getElementById('inv_state').options[document.getElementById('inv_state').selectedIndex].text;
+        document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
+        document.getElementById('p_place').innerText = place;
+        document.getElementById('p_billed').innerText = fullBilled;
+        document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
+        document.getElementById('p_sub').innerText = sub.toFixed(2);
+        document.getElementById('p_tax_container').innerHTML = stateVal === "09" ? `<p>CGST: ₹ ${(taxTotal/2).toFixed(2)}</p><p>SGST: ₹ ${(taxTotal/2).toFixed(2)}</p>` : `<p>IGST: ₹ ${taxTotal.toFixed(2)}</p>`;
+        document.getElementById('p_round').innerText = (rounded - total).toFixed(2);
+        document.getElementById('p_grand').innerText = rounded.toFixed(2); // FIX: Explicitly set grand total
+        document.getElementById('p_words').innerText = indianNumToWords(rounded);
+        document.getElementById('p_eway_no').innerText = (rounded > 50000) ? (document.getElementById('inv_eway').value || "REQUIRED") : "N/A";
 
         // SYNC TO GOOGLE SHEET
         const formData = new FormData();
@@ -193,21 +215,16 @@
         
         fetch(scriptURL, { method: 'POST', body: formData }).catch(e => console.error('Sheet Sync Error', e));
 
-        // PDF SYNC
-        document.getElementById('p_no').innerText = invNo; document.getElementById('p_date').innerText = invDate;
-        document.getElementById('p_state').innerText = document.getElementById('inv_state').options[document.getElementById('inv_state').selectedIndex].text;
-        document.getElementById('p_mode').innerText = document.getElementById('inv_mode').value;
-        document.getElementById('p_place').innerText = place; document.getElementById('p_billed').innerText = fullBilled;
-        document.getElementById('p_shipped').innerText = document.getElementById('inv_shipped').value;
-        document.getElementById('p_sub').innerText = sub.toFixed(2);
-        document.getElementById('p_tax_container').innerHTML = stateVal === "09" ? `<p>CGST: ₹ ${(taxTotal/2).toFixed(2)}</p><p>SGST: ₹ ${(taxTotal/2).toFixed(2)}</p>` : `<p>IGST: ₹ ${taxTotal.toFixed(2)}</p>`;
-        document.getElementById('p_round').innerText = (rounded - total).toFixed(2);
-        document.getElementById('p_words').innerText = indianNumToWords(rounded);
-        document.getElementById('p_eway_no').innerText = (rounded > 50000) ? (document.getElementById('inv_eway').value || "REQUIRED") : "N/A";
-
         const element = document.getElementById('pdf-export');
         element.style.display = 'block';
-        html2pdf().from(element).set({ margin: 0, filename: invNo + '.pdf', html2canvas: { scale: 3 }, jsPDF: { format: 'a4' } }).save().then(() => { element.style.display = 'none'; });
+        html2pdf().from(element).set({ 
+            margin: 0, 
+            filename: invNo + '.pdf', 
+            html2canvas: { scale: 3 }, 
+            jsPDF: { format: 'a4' } 
+        }).save().then(() => { 
+            element.style.display = 'none'; 
+        });
     }
 </script>
 </body>

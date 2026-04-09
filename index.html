@@ -10,16 +10,16 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <style>
-        /* MOBILE EDITOR UI */
-        body { font-family: -apple-system, sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
+        /* EDITOR UI */
+        body { font-family: sans-serif; background: #f0f2f5; margin: 0; padding: 10px; }
         .editor-container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h2 { text-align: center; font-size: 18px; color: #1c1e21; margin-top: 0; }
+        h2 { text-align: center; font-size: 18px; margin-top: 0; }
         .field-group { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b4f56; }
+        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid #dddfe2; border-radius: 6px; box-sizing: border-box; font-size: 15px; background: #f5f6f7; }
         .item-card { border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 10px; background: #fff; }
-        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 15px; }
-        .btn-add { background: #e7f3ff; color: #1877f2; margin-top: 5px; }
+        .btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-add { background: #e7f3ff; color: #1877f2; }
         .btn-dl { background: #1c1e21; color: white; margin-top: 20px; }
 
         /* A4 PDF OUTPUT STYLING */
@@ -32,20 +32,32 @@
         .p-info-table td { border: 1px solid #000; padding: 5px; font-size: 12px; width: 25%; }
 
         .p-address-row { display: flex; gap: 15px; margin-bottom: 15px; }
-        .p-address-box { flex: 1; border: 1px solid #000; padding: 8px; min-height: 80px; font-size: 12px; }
+        /* MODIFICATION 1: Text wrapping for Address Boxes */
+        .p-address-box { 
+            flex: 1; 
+            border: 1px solid #000; 
+            padding: 8px; 
+            min-height: 80px; 
+            font-size: 11px;
+            word-wrap: break-word; 
+            white-space: pre-wrap; 
+            overflow-wrap: break-word;
+        }
 
-        .p-item-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .p-item-table th, .p-item-table td { border: 1px solid #000; padding: 6px; font-size: 11px; text-align: center; }
+        .p-item-table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
+        .p-item-table th, .p-item-table td { border: 1px solid #000; padding: 6px; font-size: 10px; text-align: center; overflow-wrap: break-word; }
         .p-item-table th { background: #f2f2f2; }
+        /* MODIFICATION 1: Text wrapping for Item column */
+        .p-item-table td:nth-child(2) { text-align: left; white-space: normal; }
 
         .p-totals { text-align: right; margin-top: 15px; font-size: 13px; line-height: 1.6; }
         .p-grand-total { font-size: 16px; font-weight: bold; border-top: 1px solid #000; padding-top: 5px; display: inline-block; min-width: 220px; }
 
-        .p-bottom-row { display: flex; justify-content: space-between; margin-top: 20px; border: 1px solid #000; border-radius: 0; }
+        .p-bottom-row { display: flex; justify-content: space-between; margin-top: 20px; border: 1px solid #000; }
         .p-bottom-box { padding: 8px; font-size: 10px; flex: 1; border-right: 1px solid #000; }
         .p-bottom-box:last-child { border-right: none; }
 
-        .p-footer { display: flex; justify-content: space-between; margin-top: 60px; font-size: 13px; }
+        .p-footer { display: flex; justify-content: space-between; margin-top: 50px; font-size: 13px; }
     </style>
 </head>
 <body>
@@ -66,7 +78,7 @@
     <label>Items:</label>
     <div id="item-list"></div>
     <button class="btn btn-add" onclick="addItem()">+ Add Item</button>
-    <button class="btn btn-dl" onclick="downloadPDF()">Download EXACT Invoice</button>
+    <button class="btn btn-dl" onclick="downloadPDF()">Download Invoice</button>
 </div>
 
 <div id="pdf-export">
@@ -85,12 +97,23 @@
     </table>
 
     <div class="p-address-row">
-        <div class="p-address-box"><b>Billed To:</b><br><span id="p_billed" style="white-space: pre-wrap;"></span></div>
-        <div class="p-address-box"><b>Shipped To:</b><br><span id="p_shipped" style="white-space: pre-wrap;"></span></div>
+        <div class="p-address-box"><b>Billed To:</b><br><span id="p_billed"></span></div>
+        <div class="p-address-box"><b>Shipped To:</b><br><span id="p_shipped"></span></div>
     </div>
 
     <table class="p-item-table">
-        <thead><tr><th>S.No</th><th>Item</th><th>CAS</th><th>Pack</th><th>Qty</th><th>Rate</th><th>GST%</th><th>Total</th></tr></thead>
+        <thead>
+            <tr>
+                <th style="width: 8%;">S.No</th>
+                <th style="width: 32%;">Item</th>
+                <th style="width: 15%;">CAS</th>
+                <th style="width: 10%;">Pack</th>
+                <th style="width: 8%;">Qty</th>
+                <th style="width: 10%;">Rate</th>
+                <th style="width: 7%;">GST%</th>
+                <th style="width: 10%;">Total</th>
+            </tr>
+        </thead>
         <tbody id="p_body"></tbody>
     </table>
 
@@ -134,7 +157,7 @@
         const div = document.createElement('div');
         div.className = 'item-card';
         div.innerHTML = `
-            <input placeholder="Item Description" class="i_name" style="margin-bottom:8px">
+            <textarea placeholder="Item Description" class="i_name" style="margin-bottom:8px"></textarea>
             <div style="display:flex; gap:5px; margin-bottom:8px;">
                 <input placeholder="CAS" class="i_cas" style="flex:1">
                 <input placeholder="Pack" class="i_pack" style="flex:1">
@@ -148,18 +171,20 @@
     }
     addItem();
 
-    function numToWords(n) {
+    /* MODIFICATION 2: Indian Numbering System Logic */
+    function indianNumToWords(num) {
         const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
         const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-        const format = (v) => {
+        
+        function format(v) {
             if (v < 20) return a[v];
             if (v < 100) return b[Math.floor(v / 10)] + ' ' + a[v % 10];
             if (v < 1000) return a[Math.floor(v / 100)] + ' Hundred ' + format(v % 100);
             if (v < 100000) return format(Math.floor(v / 1000)) + ' Thousand ' + format(v % 1000);
             if (v < 10000000) return format(Math.floor(v / 100000)) + ' Lakh ' + format(v % 100000);
             return format(Math.floor(v / 10000000)) + ' Crore ' + format(v % 10000000);
-        };
-        return n > 0 ? (format(n) + "Rupees Only").replace(/\s+/g, ' ') : "Zero Rupees Only";
+        }
+        return num > 0 ? (format(num) + "Rupees Only").replace(/\s+/g, ' ') : "Zero Rupees Only";
     }
 
     function downloadPDF() {
@@ -184,7 +209,16 @@
             const lineTax = lineSub * (gst / 100);
             sub += lineSub; taxTotal += lineTax;
 
-            pBody.innerHTML += `<tr><td>${i+1}</td><td>${row.querySelector('.i_name').value}</td><td>${row.querySelector('.i_cas').value}</td><td>${row.querySelector('.i_pack').value}</td><td>${qty}</td><td>${rate.toFixed(2)}</td><td>${gst}%</td><td>${(lineSub+lineTax).toFixed(2)}</td></tr>`;
+            pBody.innerHTML += `<tr>
+                <td>${i+1}</td>
+                <td style="text-align:left;">${row.querySelector('.i_name').value}</td>
+                <td>${row.querySelector('.i_cas').value}</td>
+                <td>${row.querySelector('.i_pack').value}</td>
+                <td>${qty}</td>
+                <td>${rate.toFixed(2)}</td>
+                <td>${gst}%</td>
+                <td>${(lineSub+lineTax).toFixed(2)}</td>
+            </tr>`;
         });
 
         const rounded = Math.round(sub + taxTotal);
@@ -202,7 +236,7 @@
 
         document.getElementById('p_round').innerText = (rounded - (sub + taxTotal)).toFixed(2);
         document.getElementById('p_grand').innerText = rounded.toFixed(2);
-        document.getElementById('p_words').innerText = numToWords(rounded);
+        document.getElementById('p_words').innerText = indianNumToWords(rounded);
 
         const element = document.getElementById('pdf-export');
         element.style.display = 'block';
